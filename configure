@@ -1,0 +1,336 @@
+#!/bin/sh
+# Based on the configure script from musl libc, MIT licensed
+
+usage () {
+cat <<EOF
+Usage: $0 [OPTION]... [VAR=VALUE]...
+
+To assign environment variables (e.g., CC, CFLAGS...), specify them as
+VAR=VALUE.  See below for descriptions of some of the useful variables.
+
+Defaults for the options are specified in brackets.
+
+Configuration:
+  --srcdir=DIR            source directory [detected]
+
+Installation directories:
+  --prefix=PREFIX         main installation prefix [/usr/local]
+  --exec-prefix=EPREFIX   installation prefix for executable files [PREFIX]
+
+Fine tuning of the installation directories:
+  --bindir=DIR            user executables [EPREFIX/bin]
+  --sharedir=DIR          share directories [PREFIX/share]
+  --docdir=DIR            misc. documentation [PREFIX/share/doc]
+  --mandir=DIR            man pages [PREFIX/share/man]
+
+Some influential environment variables:
+  CC                      C compiler command [detected]
+  CFLAGS                  C compiler flags [-Os -pipe ...]
+  LDFLAGS                 Linker flags
+
+Use these variables to override the choices made by configure.
+
+EOF
+exit 0
+}
+
+# helper functions
+
+
+quote () {
+tr '\n' ' ' <<EOF | grep '^[-[:alnum:]_=,./:]* $' >/dev/null 2>&1 && { echo "$1" ; return 0 ; }
+$1
+EOF
+printf %s\\n "$1" | sed -e "s/'/'\\\\''/g" -e "1s/^/'/" -e "\$s/\$/'/" -e "s#^'\([-[:alnum:]_,./:]*\)=\(.*\)\$#\1='\2#"
+}
+echo () { printf "%s\n" "$*" ; }
+fail () { echo "$*" ; exit 1 ; }
+fnmatch () { eval "case \"\$2\" in $1) return 0 ;; *) return 1 ;; esac" ; }
+cmdexists () { type "$1" >/dev/null 2>&1 ; }
+trycc () { test -z "$CC" && cmdexists "$1" && CC=$1 ; }
+
+stripdir () {
+while eval "fnmatch '*/' \"\${$1}\"" ; do eval "$1=\${$1%/}" ; done
+}
+
+# maybe delete
+tryflag () {
+printf "checking whether compiler accepts %s... " "$2"
+echo "typedef int x;" > "$tmpc"
+if $CC $CFLAGS_TRY $2 -c -o "$tmpo" "$tmpc" >/dev/null 2>&1 ; then
+printf "yes\n"
+eval "$1=\"\${$1} \$2\""
+eval "$1=\${$1# }"
+return 0
+else
+printf "no\n"
+return 1
+fi
+}
+
+# maybe delete
+tryldflag () {
+printf "checking whether linker accepts %s... " "$2"
+echo "typedef int x;" > "$tmpc"
+if $CC $LDFLAGS_TRY -nostdlib -shared "$2" -o "$tmpo" "$tmpc" >/dev/null 2>&1 ; then
+printf "yes\n"
+eval "$1=\"\${$1} \$2\""
+eval "$1=\${$1# }"
+return 0
+else
+printf "no\n"
+return 1
+fi
+}
+
+
+# start of configure
+
+CFLAGS_AUTO=
+CFLAGS_TRY=
+LDFLAGS_AUTO=
+LDFLAGS_TRY=
+SRCDIR=
+PREFIX=/usr/local
+EXEC_PREFIX='$(PREFIX)'
+BINDIR='$(EXEC_PREFIX)/bin'
+SHAREDIR='$(PREFIX)/share'
+DOCDIR='$(PREFIX)/share/doc'
+MANDIR='$(PREFIX)/share/man'
+
+for arg ; do
+case "$arg" in
+--srcdir=*) SRCDIR=${arg#*=} ;;
+--prefix=*) PREFIX=${arg#*=} ;;
+--exec-prefix=*) EXEC_PREFIX=${arg#*=} ;;
+--bindir=*) BINDIR=${arg#*=} ;;
+--sharedir=*) SHAREDIR=${arg#*=} ;;
+--docdir=*) DOCDIR=${arg#*=} ;;
+--mandir=*) MANDIR=${arg#*=} ;;
+--environment-only) environmentonly=yes ;;
+--enable-*|--disable-*|--with-*|--without-*|--*dir=*|--build=*) ;;
+-* ) echo "$0: unknown option $arg" ;;
+CC=*) CC=${arg#*=} ;;
+CFLAGS=*) CFLAGS=${arg#*=} ;;
+CPPFLAGS=*) CPPFLAGS=${arg#*=} ;;
+LDFLAGS=*) LDFLAGS=${arg#*=} ;;
+*=*) ;;
+*) ;;
+esac
+done
+
+# CC=cc
+
+for i in SRCDIR PREFIX EXEC_PREFIX BINDIR SHAREDIR DOCDIR MANDIR ; do
+stripdir $i
+done
+
+
+have_pkgconfig=no
+printf "checking for pkg-config... "
+cmdexists pkg-config && have_pkgconfig=yes
+printf "%s\n" "$have_pkgconfig"
+
+
+#
+# Get the source dir for out-of-tree builds
+#
+if test -z "$SRCDIR" ; then
+SRCDIR="${0%/configure}"
+stripdir SRCDIR
+fi
+abs_builddir="$(pwd)" || fail "$0: cannot determine working directory"
+abs_srcdir="$(cd $SRCDIR && pwd)" || fail "$0: invalid source directory $SRCDIR"
+test "$abs_srcdir" = "$abs_builddir" && SRCDIR=.
+test "$SRCDIR" != "." -a -f Makefile -a ! -h Makefile && fail "$0: Makefile already exists in the working directory"
+
+#
+# Get a temp filename we can use
+#
+i=0
+set -C
+while : ; do i=$(($i+1))
+tmpc="./conf$$-$PPID-$i.c"
+tmpo="./conf$$-$PPID-$i.o"
+2>|/dev/null > "$tmpc" && break
+test "$i" -gt 50 && fail "$0: cannot create temporary file $tmpc"
+done
+set +C
+trap 'rm -f "$tmpc" "$tmpo"' EXIT QUIT TERM HUP
+trap 'rm -f "$tmpc" "$tmpo" && echo && fail "$0: interrupted"' INT
+
+#
+# Find a C compiler to use
+#
+printf "checking for C compiler... "
+trycc cc
+trycc gcc
+trycc clang
+printf "after checking %s\n" "$CC"
+test -n "$CC" || { echo "$0: cannot find a C compiler" ; exit 1 ; }
+
+printf "checking whether C compiler works... "
+echo "typedef int x;" > "$tmpc"
+if output=$($CC $CPPFLAGS $CFLAGS -c -o "$tmpo" "$tmpc" 2>&1) ; then
+printf "yes\n"
+else
+printf "no; compiler output follows:\n%s\n" "$output"
+exit 1
+fi
+
+tryflag CFLAGS -pipe
+
+# Try flags to optimize binary size
+tryflag CFLAGS -Wall
+tryflag CFLAGS -O2
+tryflag CFLAGS -ffunction-sections
+tryflag CFLAGS -fdata-sections
+tryldflag LDFLAGS_AUTO -Wl,--gc-sections
+
+
+printf "creating config.mk... "
+printf "CC is now %s\n" "$CC"
+
+cmdline=$(quote "$0")
+for i ; do cmdline="$cmdline $(quote "$i")" ; done
+
+exec 3>&1 1>config.mk
+
+cat << EOF
+# This version of config.mk was generated by:
+# $cmdline
+# Any changes made here will be lost if configure is re-run
+SRCDIR = $SRCDIR
+PREFIX = $PREFIX
+EXEC_PREFIX = $EXEC_PREFIX
+BINDIR = $BINDIR
+DOCPREFIX = $DOCDIR
+MANPREFIX = $MANDIR
+SHAREPREFIX = $SHAREDIR
+CC = $CC
+CFLAGS = $CFLAGS
+LDFLAGS = $LDFLAGS
+CFLAGS_STD = $CFLAGS_STD
+LDFLAGS_STD = $LDFLAGS_STD
+CFLAGS_AUTO = $CFLAGS_AUTO
+LDFLAGS_AUTO = $LDFLAGS_AUTO
+CFLAGS_DEBUG = -U_FORTIFY_SOURCE -UNDEBUG -O0 -g3 -ggdb -Wall -Wextra -pedantic -Wno-missing-field-initializers -Wno-unused-parameter
+EOF
+exec 1>&3 3>&-
+
+printf "done\n"
+
+printf "checking for liblua >= 5.1 ...\n"
+
+cat > "$tmpc" <<EOF
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+
+#if LUA_VERSION_NUM < 501
+#error "Need at least Lua 5.1"
+#endif
+
+int main(int argc, char *argv[]) {
+	lua_State *L = luaL_newstate();
+	luaL_openlibs(L);
+	lua_close(L);
+	return 0;
+}
+EOF
+
+have_lua="no"
+for liblua in luajit lua lua5.4 lua5.3 lua5.2 lua-5.3 lua-5.2 lua54 lua53 lua52; do
+# for liblua in lua lua5.4 lua5.3 lua5.2 lua-5.3 lua-5.2 lua54 lua53 lua52; do
+	printf " checking for %s... " "$liblua"
+
+	if test "$have_pkgconfig" = "yes" ; then
+		CFLAGS_LUA=$(pkg-config --cflags $liblua 2>/dev/null)
+		LDFLAGS_LUA=$(pkg-config --libs $liblua 2>/dev/null)
+		if test $? -eq 0 && $CC $CFLAGS $CFLAGS_LUA "$tmpc" \
+			$LDFLAGS $LDFLAGS_LUA -o "$tmpo" >/dev/null 2>&1 ; then
+			have_lua="yes"
+			printf "yes\n"
+			break
+		fi
+	fi
+
+	CFLAGS_LUA=""
+	LDFLAGS_LUA="-l$liblua -lm -ldl"
+
+	if $CC $CFLAGS $CFLAGS_LUA "$tmpc" \
+		$LDFLAGS $LDFLAGS_LUA -o "$tmpo" >/dev/null 2>&1 ; then
+		have_lua="yes"
+		printf "yes\n"
+		break
+	else
+		printf "no\n"
+	fi
+done
+
+test have_lua = "yes" && fail "$0: cannot find liblua"
+
+# if $liblua = "luajit"
+	# CFLAGS_LUA += -Wl,-E
+# fi
+
+have_lpeg="no"
+printf "checking for lpeg..."
+
+cat > "$tmpc" <<EOF
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+#include <assert.h>
+
+int main() {
+    lua_State *L = luaL_newstate();
+    luaL_openlibs(L);
+    int reqRes = luaL_dostring(L, "local t=require('lpeg') return (t~=nil)");
+    assert(reqRes == 0);
+
+  return 0;
+}
+EOF
+
+if test "$have_pkgconfig" = "yes" ; then
+	if test $? -eq 0 && $CC $CFLAGS $CFLAGS_LUA "$tmpc" \
+		$LDFLAGS $LDFLAGS_LUA -o "$tmpo" >/dev/null 2>&1 ; then
+		printf "yes\n"
+		have_lpeg="yes"
+		break
+	else
+		if $CC $CFLAGS $CFLAGS_LUA "$tmpc" \
+			$LDFLAGS $LDFLAGS_LUA -o "$tmpo" >/dev/null 2>&1 ; then
+			printf "yes\n"
+			have_lpeg="yes"
+			break
+		else
+			printf "no\n"
+		fi
+	fi
+fi
+
+test have_lpeg = "yes" && fail "$0: cannot find lpeg"
+
+printf "completing config.mk... "
+
+exec 3>&1 1>>config.mk
+
+cat << EOF
+CONFIG_HELP = $CONFIG_HELP
+CONFIG_LUA = $CONFIG_LUA
+CFLAGS_LUA = $CFLAGS_LUA
+LDFLAGS_LUA = $LDFLAGS_LUA
+CONFIG_LPEG = $CONFIG_LPEG
+CFLAGS_LPEG = $CFLAGS_LPEG
+LDFLAGS_LPEG = $LDFLAGS_LPEG
+EOF
+exec 1>&3 3>&-
+
+test "$SRCDIR" = "." || ln -sf $SRCDIR/Makefile .
+
+printf "CC is now %s\n" "$CC"
+
+printf "done\n"
+

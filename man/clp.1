@@ -1,0 +1,16 @@
+.TH CLP 1
+.SH NAME
+clp \- print files to stdout with syntax highlighting
+.SH SYNOPSIS
+.B clp
+[\fB\-t\fR \fIFILETYPE\fR]
+[\fB\-\-override-filetype\fR \fIFILETYPE\fR]
+file
+.SH DESCRIPTION
+.B clp
+reads an input file, determines its language from its filetype, and writes
+it to stdout with syntax highlighting.
+.SH OPTIONS
+.TP
+.BR \-t ", " \-\-override-filetype=\fIFILETYPE\fR
+Force a language's syntax for highlighting the file
