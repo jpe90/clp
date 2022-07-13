@@ -11,6 +11,7 @@
 #include <libgen.h>
 #include <signal.h>
 
+
 #define OPTPARSE_IMPLEMENTATION
 #include "optparse.h"
 
@@ -85,7 +86,7 @@ static bool package_exists(lua_State *L, const char *name) {
 
 int main(int argc, char *argv[]) {
 	struct optparse_long longopts[] = {
-			{"override-filetype", 't', OPTPARSE_OPTIONAL},
+			{"override-filetype", 't', OPTPARSE_REQUIRED},
 			{0}};
 
 	lua_State *L = luaL_newstate();
@@ -106,13 +107,6 @@ int main(int argc, char *argv[]) {
 	}
 
 	lua_path_add(L, CLP_PATH);
-
-	// TODO: make this the install dir
-	/* lua_path_add(L, "/Users/jon/Development/c/clp"); */
-	/* lua_path_add(L, "/Users/jon/Development/c/clp/lua"); */
-	/* lua_path_add(L, "/Users/jon/Development/c/clp/lexers"); */
-
-
 
 	const char *xdg_config = getenv("XDG_CONFIG_HOME");
 	if (xdg_config) {
