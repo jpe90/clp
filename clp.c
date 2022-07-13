@@ -172,7 +172,7 @@ int main(int argc, char *argv[]) {
 	filename = optparse_arg(&options);
 
 	if (!filename) {
-		printf("Usage: clp [--filetype_override] file");
+		printf("Usage: clp [--filetype_override] file\n");
 		return 1;
 	}
 	lua_getglobal(L, "write");
