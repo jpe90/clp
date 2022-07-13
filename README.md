@@ -10,6 +10,11 @@ parsing expression grammars to improve upon traditional regex parsers
 
 ## Installation
 
+you'll need the following dependencies:
+
+- a C99 Compiler
+- Lua or LuaJIT (the latter for better performance)
+- [LPEG](http://www.inf.puc-rio.br/~roberto/lpeg/)
 ```
 $ ./configure
 $ make
@@ -21,3 +26,31 @@ $ make
 ```
 $ clp [-t FILETYPE] filename
 ```
+
+## Motivation
+
+clp runs faster than other command line syntax highlighting programs. When used
+as a previewer for a fuzzy finder in a project with large source files, it can
+make a very perceptible difference. Quick benchmarks on my machine (clp
+installed with LuaJIT, highlighting
+[sqlite3.c](https://fossies.org/linux/sqlite/sqlite3.c))
+
+```
+time clp sqlite3.c > /dev/null                   # 423.10 millis
+time bat --color=always -p sqlite3.c > /dev/null # 3.79 secs
+time source-highlight sqlite3.c > /dev/null      # 4.72 secs
+```
+
+Parsers are upstreamed from the
+[Scintillua](https://orbitalquark.github.io/scintillua/) project. It's actively
+maintained, has great support even for niche languages, and supporting new
+languages is much easier than alternatives.
+
+## Contributing
+
+Contributions are welcome! Here are some things that would be especially
+helpful:
+
+- Adding functionality to highlight lines (without tanking performance!)
+- Better interface for customizing color themes
+- Bugfixes/code quality improvements
