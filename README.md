@@ -27,6 +27,9 @@ $ make
 $ clp [-t FILETYPE] filename
 ```
 
+clp will determine how to highlight the file by its extension, but you can
+override this behavior with the `-t` flag.
+
 ## Motivation
 
 clp runs faster than other command line syntax highlighting programs. When used
@@ -43,8 +46,8 @@ time source-highlight sqlite3.c > /dev/null      # 4.72 secs
 
 Parsers are upstreamed from the
 [Scintillua](https://orbitalquark.github.io/scintillua/) project. It's actively
-maintained, has great support even for niche languages, and supporting new
-languages is much easier than alternatives.
+maintained, has great support even for niche languages, and easy to use
+relative to other syntax definition mechanisms.
 
 ## Contributing
 
