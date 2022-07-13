@@ -53,3 +53,5 @@ Mkfile.old
 dkms.conf
 tags
 .DS_Store
+clp
+config.mk
