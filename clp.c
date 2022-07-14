@@ -118,22 +118,6 @@ int main(int argc, char *argv[]) {
 		lua_path_add(L, path);
 	}
 
-	ssize_t len = readlink("/proc/self/exe", path, sizeof(path) - 1);
-	if (len > 0) {
-		path[len] = '\0';
-		/* some idotic dirname(3) implementations return pointers to statically
-		 * allocated memory, hence we use memmove to copy it back */
-		char *dir = dirname(path);
-		if (dir) {
-			size_t len = strlen(dir) + 1;
-			if (len < sizeof(path) - sizeof("/lua")) {
-				memmove(path, dir, len);
-				strcat(path, "/lua");
-				lua_path_add(L, path);
-			}
-		}
-	}
-
 	int ret = 0;
 	int status = 0;
 	if (!package_exists(L, "clp")) {
