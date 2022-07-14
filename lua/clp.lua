@@ -51,4 +51,11 @@ function write(args)
 	file:close()
 end
 
+function print_available_overrides()
+	print('Available overrides:')
+	for lang, _ in pairs(ftdetect.filetypes) do
+		print('- ' .. lang)
+	end
+end
+
 return clp

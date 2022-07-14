@@ -87,6 +87,7 @@ static bool package_exists(lua_State *L, const char *name) {
 int main(int argc, char *argv[]) {
 	struct optparse_long longopts[] = {
 			{"override-filetype", 't', OPTPARSE_REQUIRED},
+			{"list-overrides", 'l', OPTPARSE_NONE},
 			{0}};
 
 	lua_State *L = luaL_newstate();
@@ -134,26 +135,38 @@ int main(int argc, char *argv[]) {
 	lua_newtable(L);
 
 	int option = 0;
-	char *filename;
-	char *filetype_override;
+	char *filename = "";
+	char *filetype_override = "";
 	struct optparse options;
 
 	optparse_init(&options, argv);
 	while ((option = optparse_long(&options, longopts, NULL)) != -1) {
 		switch (option) {
+		case 'l':
+			lua_getglobal(L, "print_available_overrides");
+			ret = lua_pcall(L, 0, 0, 0);
+			if (ret != 0) {
+				fprintf(stderr, "%s\n", lua_tostring(L, -1));
+				return 1;
+			}
+			lua_close(L);
+			return 0;
 		case 't':
-			lua_pushliteral(L, "filetype_override");
 			filetype_override = options.optarg;
-			lua_pushstring(L, filetype_override);
-			lua_settable(L, -3);
 			break;
 		}
+	}
+
+	if(!(strlen(filetype_override) == 0)) {
+		lua_pushliteral(L, "filetype_override");
+		lua_pushstring(L, filetype_override);
+		lua_settable(L, -3);
 	}
 
 	filename = optparse_arg(&options);
 
 	if (!filename) {
-		printf("Usage: clp [--filetype_override] file\n");
+		printf("Usage: clp [options] file\n");
 		return 1;
 	}
 	lua_pushliteral(L, "filename");
