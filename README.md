@@ -10,7 +10,7 @@ parsing expression grammars to improve upon traditional regex parsers
 
 ## Installation
 
-you'll need the following dependencies:
+In order to build from source, you'll need:
 
 - a POSIX compliant operating system
 - a C99 Compiler
