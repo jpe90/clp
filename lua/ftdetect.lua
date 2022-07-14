@@ -1,5 +1,9 @@
 ftdetect = {}
 
+ftdetect.ignoresuffixes = {
+	"~$", "%.orig$", "%.bak$", "%.old$", "%.new$"
+}
+
 ftdetect.filetypes = {
 	actionscript = {
 		ext = { "%.as$", "%.asc$" },
@@ -38,8 +42,8 @@ ftdetect.filetypes = {
 		ext = { "%.awk$" },
 	},
 	bash = {
-		utility = { "^[db]ash$", "^sh$","^t?csh$","^zsh$" },
-		ext = { "%.bash$", "%.csh$", "%.sh$", "%.zsh$" ,"^APKBUILD$", "%.ebuild$", "^.bashrc$", "^.bash_profile$" },
+		utility = { "^[db]ash$", "^sh$", "^t?csh$", "^zsh$" },
+		ext = { "%.bash$", "%.csh$", "%.sh$", "%.zsh$", "^APKBUILD$", "%.ebuild$", "^.bashrc$", "^.bash_profile$" },
 		mime = { "text/x-shellscript", "application/x-shellscript" },
 	},
 	batch = {
@@ -58,7 +62,7 @@ ftdetect.filetypes = {
 		ext = { "%.ck$" },
 	},
 	clojure = {
-		ext = { "%.clj$", "%.cljc$",  "%.cljs$", "%.edn$" }
+		ext = { "%.clj$", "%.cljc$", "%.cljs$", "%.edn$" }
 	},
 	cmake = {
 		ext = { "%.cmake$", "%.cmake.in$", "%.ctest$", "%.ctest.in$" },
@@ -244,13 +248,13 @@ ftdetect.filetypes = {
 		ext = { "%.lgt$" },
 	},
 	lua = {
-		utility = {"^lua%-?5?%d?$", "^lua%-?5%.%d$" },
+		utility = { "^lua%-?5?%d?$", "^lua%-?5%.%d$" },
 		ext = { "%.lua$" },
 		mime = { "text/x-lua" },
 	},
 	makefile = {
-		hashbang = {"^#!/usr/bin/make"},
-		utility = {"^make$"},
+		hashbang = { "^#!/usr/bin/make" },
+		utility = { "^make$" },
 		ext = { "%.iface$", "%.mak$", "%.mk$", "GNUmakefile", "makefile", "Makefile" },
 		mime = { "text/x-makefile" },
 	},
@@ -340,7 +344,7 @@ ftdetect.filetypes = {
 		ext = { "%.re$" },
 	},
 	rc = {
-		utility = {"^rc$"},
+		utility = { "^rc$" },
 		ext = { "%.rc$", "%.es$" },
 	},
 	rebol = {
@@ -395,7 +399,7 @@ ftdetect.filetypes = {
 	spin = {
 		ext = { "%.spin$" }
 	},
-	sql= {
+	sql = {
 		ext = { "%.ddl$", "%.sql$" },
 	},
 	strace = {
@@ -414,7 +418,7 @@ ftdetect.filetypes = {
 		ext = { "%.taskpaper$" },
 	},
 	tcl = {
-		utility = {"^tclsh$", "^jimsh$" },
+		utility = { "^tclsh$", "^jimsh$" },
 		ext = { "%.tcl$", "%.tk$" },
 	},
 	texinfo = {
@@ -460,7 +464,7 @@ ftdetect.filetypes = {
 		},
 	},
 	xtend = {
-		ext = {"%.xtend$" },
+		ext = { "%.xtend$" },
 	},
 	yaml = {
 		ext = { "%.yaml$", "%.yml$" },
@@ -471,14 +475,116 @@ ftdetect.filetypes = {
 	},
 }
 
-ftdetect.lookup_lexer = function (filename)
-	-- uhh
-	for lang, ft in pairs(ftdetect.filetypes) do
-		for _, pattern in pairs(ft.ext or {}) do
-			if filename:match(pattern) then
-				return lang;
+ftdetect.lookup_lexer = function(filename)
+	-- remove ignored suffixes from filename
+	local sanitizedfn = filename
+	if sanitizedfn ~= nil then
+		sanitizedfn = sanitizedfn:gsub('^.*/', '')
+		repeat
+			local changed = false
+			for _, pattern in pairs(ftdetect.ignoresuffixes) do
+				local start = sanitizedfn:find(pattern)
+				if start then
+					sanitizedfn = sanitizedfn:sub(1, start - 1)
+					changed = true
+				end
+			end
+		until not changed
+	end
+
+	-- detect filetype by filename ending with a configured extension
+	if sanitizedfn ~= nil then
+		for lang, ft in pairs(ftdetect.filetypes) do
+			for _, pattern in pairs(ft.ext or {}) do
+				if sanitizedfn:match(pattern) then
+					return lang
+				end
 			end
 		end
+	end
+
+	-- run file(1) to determine mime type
+	local mime
+	if filename ~= nil then
+		local file = io.popen(string.format("file -bL --mime-type -- '%s'", filename:gsub("'", "'\\''")))
+		if file then
+			mime = file:read('*all')
+			file:close()
+			if mime then
+				mime = mime:gsub('%s*$', '')
+			end
+			if mime and #mime > 0 then
+				for lang, ft in pairs(ftdetect.filetypes) do
+					for _, ft_mime in pairs(ft.mime or {}) do
+						if mime == ft_mime then
+							return lang
+						end
+					end
+				end
+			end
+		end
+	end
+
+	-- pass first few bytes of file to custom file type detector functions
+	local file = assert(io.open(filename, 'rb'))
+	local data = file:read(256)
+	if data and #data > 0 then
+		for lang, ft in pairs(ftdetect.filetypes) do
+			if type(ft.detect) == 'function' and ft.detect(file, data) then
+				return lang
+			end
+		end
+
+	--[[ hashbang check
+	hashbangs only have command <SPACE> argument
+		if /env, find utility in args
+			discard first arg if /-[^S]*S/; and all subsequent /=/
+			NOTE: this means you can't have a command with /^-|=/
+	return first field, which should be the utility.
+	NOTE: long-options unsupported
+	--]]
+		local fullhb, utility = data:match "^#![ \t]*(/+[^/\n]+[^\n]*)"
+		if fullhb then
+			local i, field = 1, {}
+			for m in fullhb:gmatch "%g+" do field[i], i = m, i + 1 end
+			-- NOTE: executables should not have a space (or =, see below)
+			if field[1]:match "/env$" then
+				table.remove(field, 1)
+				-- it is assumed that the first argument are short options, with -S inside
+				if string.match(field[1] or "", "^%-[^S-]*S") then -- -S found
+					table.remove(field, 1)
+					-- skip all filename=value
+					while string.match(field[1] or "", "=") do
+						table.remove(field, 1)
+					end
+					-- (hopefully) whatever is left in field[1] should be the utility or nil
+				end
+			end
+			utility = string.match(field[1] or "", "[^/]+$") -- remove filepath
+		end
+
+		local function searcher(tbl, subject)
+			for i, pattern in ipairs(tbl or {}) do
+				if string.match(subject, pattern) then
+					return true
+				end
+			end
+			return false
+		end
+
+		if utility or fullhb then
+			for lang, ft in pairs(ftdetect.filetypes) do
+				if utility and searcher(ft.utility, utility)
+						or
+						fullhb and searcher(ft.hashbang, fullhb)
+				then
+					return lang
+				end
+			end
+		end
+
+		-- try text lexer as a last resort
+		return 'text'
 	end
 end
 

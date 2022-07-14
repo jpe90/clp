@@ -12,6 +12,7 @@ parsing expression grammars to improve upon traditional regex parsers
 
 you'll need the following dependencies:
 
+- a POSIX compliant operating system
 - a C99 Compiler
 - Lua or LuaJIT (the latter for better performance)
 - [LPEG](http://www.inf.puc-rio.br/~roberto/lpeg/)

@@ -146,6 +146,9 @@ int main(int argc, char *argv[]) {
 	if (status != 0)
 		fprintf(stderr, "%s\n", lua_tostring(L, -1));
 
+	lua_getglobal(L, "write");
+	lua_newtable(L);
+
 	int option = 0;
 	char *filename;
 	char *filetype_override;
@@ -169,8 +172,6 @@ int main(int argc, char *argv[]) {
 		printf("Usage: clp [--filetype_override] file\n");
 		return 1;
 	}
-	lua_getglobal(L, "write");
-	lua_newtable(L);
 	lua_pushliteral(L, "filename");
 	lua_pushstring(L, filename);
 	lua_settable(L, -3);
