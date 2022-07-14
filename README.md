@@ -52,8 +52,10 @@ relative to other syntax definition mechanisms.
 
 ## Contributing
 
-Contributions are welcome! Here are some things that would be especially
-helpful:
+Contributions are welcome! Feel free to send a pull request on [Github](https://github.com/jpe90/clp)
+or a patch on [Sourcehut](https://git.sr.ht/~eskin/clp).
+
+Here are some things that would be especially helpful:
 
 - Adding functionality to highlight lines (without tanking performance!)
 - Better interface for customizing color themes
