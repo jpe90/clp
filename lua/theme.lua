@@ -2,7 +2,6 @@ local colors = require('colors')
 
 local theme = {}
 
--- local term = require('term')
 local default_theme = {
 	-- bold => bright
 	-- italics => underscore

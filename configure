@@ -232,7 +232,6 @@ EOF
 
 have_lua="no"
 for liblua in luajit lua lua5.4 lua5.3 lua5.2 lua-5.3 lua-5.2 lua54 lua53 lua52; do
-# for liblua in lua lua5.4 lua5.3 lua5.2 lua-5.3 lua-5.2 lua54 lua53 lua52; do
 	printf " checking for %s... " "$liblua"
 
 	if test "$have_pkgconfig" = "yes" ; then
@@ -264,6 +263,7 @@ test have_lua = "yes" && fail "$0: No lua installation was found."
 # if $liblua = "luajit"
 	# CFLAGS_LUA += -Wl,-E
 # fi
+
 
 have_lpeg="no"
 printf "checking for lpeg..."

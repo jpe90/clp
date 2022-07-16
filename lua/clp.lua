@@ -4,7 +4,6 @@ local theme = require('theme')
 local ftdetect = require('ftdetect')
 local lexers = require('lexer')
 local default_theme = theme.default_theme
-local selected_theme = theme.selected_theme
 
 -- https://github.com/martanne/vis/issues/601#issuecomment-327018674
 function write(args)
