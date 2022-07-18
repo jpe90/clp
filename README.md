@@ -25,7 +25,7 @@ $ make
 ## Usage
 
 ```
-$ clp [-t FILETYPE] filename
+$ clp [options] filename
 ```
 
 clp will determine how to highlight the file by its extension, but you can

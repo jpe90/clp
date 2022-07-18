@@ -3,21 +3,22 @@
 clp \- print files to stdout with syntax highlighting
 .SH SYNOPSIS
 .B clp
-[\fb\-t\fr \fifiletype\fr]
-[\fb\-\-override-filetype\fr \fifiletype\fr]
-[\fb\-l\fr]
-[\fb\-\-list-overrides\fr]
+[\fboptions\fr]
 file
 .SH DESCRIPTION
 .B clp
-reads an input file, determines its language from its filetype, and writes it to stdout with syntax highlighting.
+Reads an input file, determines its language from its filetype, and writes it to stdout with syntax highlighting.
 .SH OPTIONS
-.TP
-.BR \-l ", " \-\-list-overrides
+.HP
+\fB\-l\fR, \fB\-\-list\-overrides\fR
+.IP
 See below.
-.TP
-.BR \-t ", " \-\-override-filetype=\fIFILETYPE\fR
+.HP
+\fB\-t\fR, \fB\-\-override\-filetype\fR {filetype}
+.IP
 Force a language's syntax for highlighting the file. To see available filetypes, run \fBclp \-\-list\-overrides\fR\
-.TP
-.BR \-t ", " \-\-highlight-line=\fILINE NUMBER\fR
-Highlight a non-blank line by inverting its colors
+
+.HP
+\fB\-h\fR, \fB\-\-highlight\-line\fR {number}
+.IP
+Highlight a non-blank line
