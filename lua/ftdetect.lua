@@ -1,4 +1,4 @@
-ftdetect = {}
+qftdetect = {}
 
 ftdetect.ignoresuffixes = {
 	"~$", "%.orig$", "%.bak$", "%.old$", "%.new$"
@@ -42,8 +42,8 @@ ftdetect.filetypes = {
 		ext = { "%.awk$" },
 	},
 	bash = {
-		utility = { "^[db]ash$", "^sh$", "^t?csh$", "^zsh$" },
-		ext = { "%.bash$", "%.csh$", "%.sh$", "%.zsh$", "^APKBUILD$", "%.ebuild$", "^.bashrc$", "^.bash_profile$" },
+		utility = { "^[db]ash$", "^sh$","^t?csh$","^zsh$" },
+		ext = { "%.bash$", "%.csh$", "%.sh$", "%.zsh$" ,"^APKBUILD$", "%.ebuild$", "^.bashrc$", "^.bash_profile$" },
 		mime = { "text/x-shellscript", "application/x-shellscript" },
 	},
 	batch = {
@@ -62,7 +62,7 @@ ftdetect.filetypes = {
 		ext = { "%.ck$" },
 	},
 	clojure = {
-		ext = { "%.clj$", "%.cljc$", "%.cljs$", "%.edn$" }
+		ext = { "%.clj$", "%.cljc$",  "%.cljs$", "%.edn$" }
 	},
 	cmake = {
 		ext = { "%.cmake$", "%.cmake.in$", "%.ctest$", "%.ctest.in$" },
@@ -164,6 +164,10 @@ ftdetect.filetypes = {
 	gherkin = {
 		ext = { "%.feature$" },
 	},
+	['git-commit'] = {
+		ext = { "^COMMIT_EDITMSG$" },
+		cmd = { "set colorcolumn 72" },
+	},
 	['git-rebase'] = {
 		ext = { "git%-rebase%-todo" },
 	},
@@ -214,6 +218,9 @@ ftdetect.filetypes = {
 	javascript = {
 		ext = { "%.cjs$", "%.js$", "%.jsfl$", "%.mjs$", "%.ts$", "%.jsx$", "%.tsx$" },
 	},
+	jq = {
+		ext = { "%.jq$" },
+	},
 	json = {
 		ext = { "%.json$" },
 		mime = { "text/x-json" },
@@ -248,15 +255,18 @@ ftdetect.filetypes = {
 		ext = { "%.lgt$" },
 	},
 	lua = {
-		utility = { "^lua%-?5?%d?$", "^lua%-?5%.%d$" },
+		utility = {"^lua%-?5?%d?$", "^lua%-?5%.%d$" },
 		ext = { "%.lua$" },
 		mime = { "text/x-lua" },
 	},
 	makefile = {
-		hashbang = { "^#!/usr/bin/make" },
-		utility = { "^make$" },
+		hashbang = {"^#!/usr/bin/make"},
+		utility = {"^make$"},
 		ext = { "%.iface$", "%.mak$", "%.mk$", "GNUmakefile", "makefile", "Makefile" },
 		mime = { "text/x-makefile" },
+		detect = function(_, data)
+			return data:match("^#!/usr/bin/make")
+		end
 	},
 	man = {
 		ext = {
@@ -344,7 +354,7 @@ ftdetect.filetypes = {
 		ext = { "%.re$" },
 	},
 	rc = {
-		utility = { "^rc$" },
+		utility = {"^rc$"},
 		ext = { "%.rc$", "%.es$" },
 	},
 	rebol = {
@@ -399,7 +409,7 @@ ftdetect.filetypes = {
 	spin = {
 		ext = { "%.spin$" }
 	},
-	sql = {
+	sql= {
 		ext = { "%.ddl$", "%.sql$" },
 	},
 	strace = {
@@ -418,7 +428,7 @@ ftdetect.filetypes = {
 		ext = { "%.taskpaper$" },
 	},
 	tcl = {
-		utility = { "^tclsh$", "^jimsh$" },
+		utility = {"^tclsh$", "^jimsh$" },
 		ext = { "%.tcl$", "%.tk$" },
 	},
 	texinfo = {
@@ -431,6 +441,9 @@ ftdetect.filetypes = {
 	},
 	toml = {
 		ext = { "%.toml$" },
+	},
+	typescript = {
+		ext = { "%.ts$" },
 	},
 	vala = {
 		ext = { "%.vala$" }
@@ -464,7 +477,7 @@ ftdetect.filetypes = {
 		},
 	},
 	xtend = {
-		ext = { "%.xtend$" },
+		ext = {"%.xtend$" },
 	},
 	yaml = {
 		ext = { "%.yaml$", "%.yml$" },
