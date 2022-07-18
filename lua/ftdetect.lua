@@ -264,9 +264,6 @@ ftdetect.filetypes = {
 		utility = {"^make$"},
 		ext = { "%.iface$", "%.mak$", "%.mk$", "GNUmakefile", "makefile", "Makefile" },
 		mime = { "text/x-makefile" },
-		detect = function(_, data)
-			return data:match("^#!/usr/bin/make")
-		end
 	},
 	man = {
 		ext = {
