@@ -1,4 +1,4 @@
-qftdetect = {}
+ftdetect = {}
 
 ftdetect.ignoresuffixes = {
 	"~$", "%.orig$", "%.bak$", "%.old$", "%.new$"
