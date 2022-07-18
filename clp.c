@@ -11,7 +11,6 @@
 #include <libgen.h>
 #include <signal.h>
 
-
 #define OPTPARSE_IMPLEMENTATION
 #include "optparse.h"
 
@@ -126,6 +125,7 @@ int main(int argc, char *argv[]) {
 		printf("WARNING: failed to load clp.lua\n");
 		exit(1);
 	}
+
 	lua_getglobal(L, "require");
 	lua_pushstring(L, "clp");
 	status = lua_pcall(L, 1, 1, 0);
@@ -140,7 +140,6 @@ int main(int argc, char *argv[]) {
 	char *filetype_override = "";
 	int highlight_line = 0;
 	struct optparse options;
-
 	optparse_init(&options, argv);
 	while ((option = optparse_long(&options, longopts, NULL)) != -1) {
 		switch (option) {
@@ -174,15 +173,16 @@ int main(int argc, char *argv[]) {
 		printf("Usage: clp [options] file\n");
 		return 1;
 	}
+
 	lua_pushliteral(L, "filename");
 	lua_pushstring(L, filename);
 	lua_settable(L, -3);
-
 	ret = lua_pcall(L, 1, 0, 0);
 	if (ret != 0) {
 		fprintf(stderr, "%s\n", lua_tostring(L, -1));
 		return 1;
 	}
+
 	lua_close(L);
 	return 0;
 }
