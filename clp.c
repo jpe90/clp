@@ -86,7 +86,7 @@ static bool package_exists(lua_State *L, const char *name) {
 
 int main(int argc, char *argv[]) {
 	struct optparse_long longopts[] = {
-			{"highlight_line", 'h', OPTPARSE_REQUIRED},
+			{"highlight-line", 'h', OPTPARSE_REQUIRED},
 			{"override-filetype", 't', OPTPARSE_REQUIRED},
 			{"list-overrides", 'l', OPTPARSE_NONE},
 			{0}};
@@ -155,15 +155,15 @@ int main(int argc, char *argv[]) {
 			return 0;
 		case 't':
 			filetype_override = options.optarg;
-    		lua_pushliteral(L, "filetype_override");
-    		lua_pushstring(L, filetype_override);
-    		lua_settable(L, -3);
+			lua_pushliteral(L, "filetype_override");
+			lua_pushstring(L, filetype_override);
+			lua_settable(L, -3);
 			break;
 		case 'h':
 			highlight_line = atoi(options.optarg);
-    		lua_pushliteral(L, "highlight_line");
-    		lua_pushinteger(L, highlight_line);
-    		lua_settable(L, -3);
+			lua_pushliteral(L, "highlight_line");
+			lua_pushinteger(L, highlight_line);
+			lua_settable(L, -3);
 			break;
 		}
 	}
