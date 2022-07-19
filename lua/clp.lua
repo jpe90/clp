@@ -13,6 +13,7 @@ function write(args)
 	local file = assert(io.open(filename, 'r'))
 	local text = file:read('*all')
 	local syntax
+
 	if filetype_override ~= nil then
 		syntax = filetype_override
 	else
@@ -23,9 +24,12 @@ function write(args)
 		print(string.format('Failed to load lexer: `%s`', syntax))
 		return 1
 	end
+
+	-- if a line was set to be highlighted, make sure it has valid bounds and
+	-- then highlight it. Otherwise just write normally to stdout.
 	local hl_line_start, hl_line_end
-	if (highlight_line ~= nil) then
-		hl_start_pos, hl_end_pos = find_endl(text, highlight_line)
+	if (highlight_line ~= nil and highlight_line > 0) then
+		hl_start_pos, hl_end_pos = find_hl_bounds(text, highlight_line)
 	end
 	if (hl_start_pos ~= nil) then
 		write_hl(text, lexer, hl_start_pos, hl_end_pos)
@@ -35,35 +39,17 @@ function write(args)
 	file:close()
 end
 
--- https://github.com/martanne/vis/issues/601#issuecomment-327018674
 function write_nohl(text, lexer)
-	local tokens = lexer:lex(text, 1)
-	local token_start = 1
-	local last = ''
-
-	for i = 1, #tokens, 2 do
-		local token_end = tokens[i + 1] - 1
-		local name = tokens[i]
-
-		local style = default_theme[name]
-		if style ~= nil then
-			-- Whereas the lexer reports all other syntaxes over
-			-- the entire span of a token, it reports 'default'
-			-- byte-by-byte. We emit only the first 'default' of
-			-- a series in order to properly display multibyte
-			-- UTF-8 characters.
-			if not (last == 'default' and name == 'default') then
-				io.write(tostring(style))
-			end
-			last = name
-		end
-		io.write(text:sub(token_start, token_end))
-		token_start = token_end + 1
-	end
+	write_text(text,lexer,default_theme)
 end
 
--- find nth and n+1th indices of the endline character in a string
-function find_endl(s, n)
+function reset_colors()
+	io.write(tostring(colors.reset))
+end
+
+-- I think modifying the lexer code to track highlighting location could be
+-- more efficient, but this is a quick and dirty approach for now
+function find_hl_bounds(s, n)
 	local i = 0
 	local hl_start_pos
 	if n == 1 then
@@ -90,22 +76,18 @@ function find_endl(s, n)
 end
 
 function write_hl(text, lexer, hl_line_start, hl_line_end)
-	-- gsub the text before, during... can we just say "rest"?
-	-- then lets print as normal and see if there's a performance hit
-	-- check if hl_line_end is nil
-	-- substring from 0 to hl_line_start
 	local pre_hl = text:sub(0, hl_line_start)
 	local hl = text:sub(hl_line_start, hl_line_end)
-	-- substitute newlines for blanks in hl
 	hl = hl:gsub("\n", "")
 	local post_hl = text:sub(hl_line_end, nil)
-	write_thing(pre_hl, lexer, default_theme)
-	if (hl ~= nil) then write_thing(hl, lexer, highlight_theme) end
-	colors.reset_colors()
-	if (post_hl ~= nil) then write_thing(post_hl, lexer, default_theme) end
+	write_text(pre_hl, lexer, default_theme)
+	if (hl ~= nil) then write_text(hl, lexer, highlight_theme) end
+	reset_colors()
+	if (post_hl ~= nil) then write_text(post_hl, lexer, default_theme) end
 end
 
-function write_thing(text, lexer, style)
+-- https://github.com/martanne/vis/issues/601#issuecomment-327018674
+function write_text(text, lexer, style)
 	local tokens = lexer:lex(text, 1)
 	local token_start = 1
 	local last = ''
@@ -132,7 +114,7 @@ function write_thing(text, lexer, style)
 end
 
 function print_available_overrides()
-	print('Available overrides:')
+	print('Available filetype overrides:')
 	for lang, _ in pairs(ftdetect.filetypes) do
 		print('- ' .. lang)
 	end

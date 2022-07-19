@@ -28,8 +28,13 @@ $ make
 $ clp [options] filename
 ```
 
-clp will determine how to highlight the file by its extension, but you can
-override this behavior with the `-t` flag.
+#### -t, --override-filetype {filetype}
+
+Force a language's syntax for highlighting the file. To see available filetypes, run clp --list-overrides
+
+#### -h, --highlight-line {number}
+
+Highlight a non-blank line
 
 ## Motivation
 
@@ -57,6 +62,6 @@ or a patch on [Sourcehut](https://git.sr.ht/~eskin/clp).
 
 Here are some things that would be especially helpful:
 
-- Adding functionality to highlight lines (without tanking performance!)
 - Better interface for customizing color themes
-- Bugfixes/code quality improvements
+- Bugfixes
+- Code quality & performance improvements

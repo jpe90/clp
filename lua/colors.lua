@@ -39,10 +39,6 @@ function colormt:__call(s)
     return self .. s .. colors.reset
 end
 
-function reset_colors()
-		io.write(tostring(colors.reset))
-end
-
 local function makecolor(value)
     return setmetatable({ value = schar(27) .. '[' .. tostring(value) .. 'm' }, colormt)
 end
@@ -83,7 +79,5 @@ local colorvalues = {
 for c, v in pairs(colorvalues) do
     colors[c] = makecolor(v)
 end
-
-colors.reset_colors = reset_colors
 
 return colors
