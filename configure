@@ -81,6 +81,38 @@ return 1
 fi
 }
 
+check_lpeg() {
+printf "  checking for lpeg... "
+ccflags=$1
+shift
+llflags=$@
+
+cat > "$tmpc" <<EOF
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+#include <assert.h>
+
+int main() {
+	lua_State *L = luaL_newstate();
+	luaL_openlibs(L);
+	int reqRes = luaL_dostring(L, "local t=require('lpeg') return (t~=nil)");
+	assert(reqRes == 0);
+	return 0;
+}
+EOF
+
+if $CC $CFLAGS $ccflags "$tmpc" \
+	$LDFLAGS $llflags -o "$tmpo" >/dev/null 2>&1 ; then
+	eval $tmpo >/dev/null 2>&1
+	if test $? -eq 0 ; then
+		printf "yes\n"
+		return 1
+	fi
+fi
+return 0
+}
+
 # start of script
 
 CFLAGS_AUTO=
@@ -231,78 +263,43 @@ int main(int argc, char *argv[]) {
 EOF
 
 have_lua="no"
+have_lpeg="no"
 for liblua in luajit lua lua5.4 lua5.3 lua5.2 lua-5.3 lua-5.2 lua54 lua53 lua52; do
 	printf " checking for %s... " "$liblua"
 
 	if test "$have_pkgconfig" = "yes" ; then
 		CFLAGS_LUA=$(pkg-config --cflags $liblua 2>/dev/null)
 		LDFLAGS_LUA=$(pkg-config --libs $liblua 2>/dev/null)
-		if test $? -eq 0 && $CC $CFLAGS $CFLAGS_LUA "$tmpc" \
-			$LDFLAGS $LDFLAGS_LUA -o "$tmpo" >/dev/null 2>&1 ; then
-			have_lua="yes"
-			printf "yes\n"
-			break
-		fi
+	else
+		CFLAGS_LUA=""
+		LDFLAGS_LUA="-l$liblua -lm -ldl"
 	fi
 
-	CFLAGS_LUA=""
-	LDFLAGS_LUA="-l$liblua -lm -ldl"
-
-	if $CC $CFLAGS $CFLAGS_LUA "$tmpc" \
-		$LDFLAGS $LDFLAGS_LUA -o "$tmpo" >/dev/null 2>&1 ; then
+	if test $? -eq 0 && $CC $CFLAGS $CFLAGS_LUA "$tmpc" \
+		$LDFLAGS $LDFLAGS_LUA -o "$tmpo" >horse.txt 2>&1 ; then
 		have_lua="yes"
 		printf "yes\n"
-		break
-	else
-		printf "no\n"
-	fi
-done
-
-test have_lua = "yes" && fail "$0: No lua installation was found."
-
-# if $liblua = "luajit"
-	# CFLAGS_LUA += -Wl,-E
-# fi
-
-
-have_lpeg="no"
-printf "checking for lpeg..."
-
-cat > "$tmpc" <<EOF
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
-#include <assert.h>
-
-int main() {
-    lua_State *L = luaL_newstate();
-    luaL_openlibs(L);
-    int reqRes = luaL_dostring(L, "local t=require('lpeg') return (t~=nil)");
-    assert(reqRes == 0);
-
-  return 0;
-}
-EOF
-
-if test "$have_pkgconfig" = "yes" ; then
-	if test $? -eq 0 && $CC $CFLAGS $CFLAGS_LUA "$tmpc" \
-		$LDFLAGS $LDFLAGS_LUA -o "$tmpo" >/dev/null 2>&1 ; then
-		printf "yes\n"
-		have_lpeg="yes"
-		break
-	else
-		if $CC $CFLAGS $CFLAGS_LUA "$tmpc" \
-			$LDFLAGS $LDFLAGS_LUA -o "$tmpo" >/dev/null 2>&1 ; then
-			printf "yes\n"
+		check_lpeg $CFLAGS_LUA $LDFLAGS_LUA
+		has_lpeg=$?
+		if (test $has_lpeg -gt 0); then
 			have_lpeg="yes"
+			printf "yes"
 			break
 		else
-			printf "no\n"
+			printf "no"
 		fi
+	else
+		printf "no"
 	fi
-fi
+	printf "\n"
+done
 
-test have_lpeg = "yes" && fail "$0: Lua dependency LPEG was not found."
+if test $have_lua = "no" ; then
+	fail "Error: Lua was not found."
+fi
+if test $have_lpeg = "no" ; then
+	fail "Error: Lua dependency LPEG was not found in any Lua installation."
+fi
 
 printf "completing config.mk... "
 
