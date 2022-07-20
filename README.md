@@ -2,7 +2,7 @@
 
 clp writes input files to stdout with syntax highlighting.
 It aims to be relatively fast, provide wide language support, and be easy
-to extend with new languages. It currently supports over 140 languages.
+to extend with new languages. It currently supports 150 languages.
 
 Language support is implemented with LPEG, a tool developed by PUC which uses
 parsing expression grammars to improve upon traditional regex parsers
@@ -14,7 +14,7 @@ In order to build from source, you'll need:
 
 - a POSIX compliant operating system
 - a C99 Compiler
-- Lua or LuaJIT (the latter for better performance)
+- Lua >= 5.1 or LuaJIT (the latter for better performance)
 - [LPEG](http://www.inf.puc-rio.br/~roberto/lpeg/)
 ```
 $ ./configure
@@ -45,9 +45,9 @@ installed with LuaJIT, highlighting
 [sqlite3.c](https://fossies.org/linux/sqlite/sqlite3.c))
 
 ```
-time clp sqlite3.c > /dev/null                   # 423.10 millis
-time bat --color=always -p sqlite3.c > /dev/null # 3.79 secs
-time source-highlight sqlite3.c > /dev/null      # 4.72 secs
+time clp sqlite3.c > /dev/null                   # 276.75 millis
+time bat --color=always -p sqlite3.c > /dev/null # 3.06 secs
+time source-highlight sqlite3.c > /dev/null      # 4.71 secs
 ```
 
 Parsers are upstreamed from the
