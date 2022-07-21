@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
 	int ret = 0;
 	int status = 0;
 	if (!package_exists(L, "clp")) {
-		printf("WARNING: failed to load clp.lua\n");
+		fprintf(stderr,"ERROR: failed to load clp.lua\n");
 		exit(1);
 	}
 
