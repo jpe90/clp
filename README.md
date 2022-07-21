@@ -10,7 +10,15 @@ parsing expression grammars to improve upon traditional regex parsers
 
 ## Installation
 
-In order to build from source, you'll need:
+### Homebrew
+
+```
+brew tap jpe90/clp
+brew install clp
+```
+
+### Building from source
+Requirements:
 
 - a POSIX compliant operating system
 - a C99 Compiler
