@@ -22,6 +22,10 @@
 #define CLP_PATH "/usr/local/share/clp"
 #endif
 
+#ifndef SRC_LUA_PATH
+#define SRC_LUA_PATH ""
+#endif
+
 void bail(lua_State *L, char *msg) {
 	fprintf(stderr, "\nFATAL ERROR:\n  %s: %s\n\n",
 					msg, lua_tostring(L, -1));
@@ -99,6 +103,9 @@ int main(int argc, char *argv[]) {
 
 	char path[PATH_MAX];
 	lua_path_add(L, CLP_PATH);
+	if(strcmp(SRC_LUA_PATH, "") != 0) {
+		lua_path_add(L, SRC_LUA_PATH);
+	}
 
 	const char *home = getenv("HOME");
 	if (!home || !*home) {

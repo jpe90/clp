@@ -4,7 +4,8 @@ CFLAGS             += -Wall -pedantic
 CFLAGS 			   += -I $(CURDIR)/include
 CFLAGS             += $(CFLAGS_LUA)
 CFLAGS             += $(CFLAGS_AUTO)
-CFLAGS             +=  -DCLP_PATH=\"${SHAREPREFIX}/clp\"
+CFLAGS             += -DCLP_PATH=\"${SHAREPREFIX}/clp\"
+CFLAGS             += -DSRC_LUA_PATH=\"${ABS_SRCDIR}/lua\"
 LDFLAGS             = $(LDFLAGS_LUA)
 LDFLAGS            += $(LDFLAGS_AUTO)
 SRC                 = clp.c
