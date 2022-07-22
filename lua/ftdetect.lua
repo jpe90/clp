@@ -1,7 +1,7 @@
 ftdetect = {}
 
 ftdetect.ignoresuffixes = {
-	"~$", "%.orig$", "%.bak$", "%.old$", "%.new$"
+	"~+$", "%.orig$", "%.bak$", "%.old$", "%.new$"
 }
 
 ftdetect.filetypes = {
@@ -487,19 +487,14 @@ ftdetect.filetypes = {
 
 ftdetect.lookup_lexer = function(filename)
 	-- remove ignored suffixes from filename
-	local sanitizedfn = filename
-	if sanitizedfn ~= nil then
-		sanitizedfn = sanitizedfn:gsub('^.*/', '')
+	local sanitizedfn = filename and filename:match"[^/]-$"
+	if sanitizedfn then
 		repeat
-			local changed = false
-			for _, pattern in pairs(ftdetect.ignoresuffixes) do
-				local start = sanitizedfn:find(pattern)
-				if start then
-					sanitizedfn = sanitizedfn:sub(1, start - 1)
-					changed = true
-				end
+			local changed = sanitizedfn
+			for _, pattern in ipairs(ftdetect.ignoresuffixes) do
+				sanitizedfn = sanitizedfn:gsub(pattern,"")
 			end
-		until not changed
+		until #sanitizedfn==0 or sanitizedfn == changed
 	end
 
 	-- detect filetype by filename ending with a configured extension
