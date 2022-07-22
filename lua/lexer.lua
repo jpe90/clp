@@ -805,12 +805,12 @@ local M = {}
 module('lexer')]=]
 
 local print = function(...)
-	io.stderr:write(
-		string.format(
-			string.rep("%s", select("#",...), " ")
-			, ... )
-		,"\n"
-	)
+  io.stderr:write(
+    string.format(
+      string.rep("%s", select("#",...), " ")
+      , ... )
+    ,"\n"
+  )
 end
 
 lpeg = require('lpeg')
