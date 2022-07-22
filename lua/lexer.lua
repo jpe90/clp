@@ -804,21 +804,13 @@ local M = {}
 --   This is an alias for `lexer.property['fold.line.groups'] = '1|0'`.
 module('lexer')]=]
 
-if not require then
-  -- Substitute for Lua's require() function, which does not require the package module to
-  -- be loaded.
-  -- Note: all modules must be in the global namespace, which is the case in LexerLPeg's default
-  -- Lua State.
-  function require(name) return name == 'lexer' and M or _G[name] end
-end
-
 local print = function(...)
-  local args = table.pack(...)
-  local msg = {}
-  for i = 1, args.n do
-    msg[#msg + 1] = tostring(args[i])
-  end
-  vis:info(table.concat(msg, ' '))
+	io.stderr:write(
+		string.format(
+			string.rep("%s", select("#",...), " ")
+			, ... )
+		,"\n"
+	)
 end
 
 lpeg = require('lpeg')
@@ -826,20 +818,6 @@ local lpeg_P, lpeg_R, lpeg_S, lpeg_V = lpeg.P, lpeg.R, lpeg.S, lpeg.V
 local lpeg_Ct, lpeg_Cc, lpeg_Cp = lpeg.Ct, lpeg.Cc, lpeg.Cp
 local lpeg_Cmt, lpeg_C = lpeg.Cmt, lpeg.C
 local lpeg_match = lpeg.match
-
--- Searches for the given *name* in the given *path*.
--- This is a safe implementation of Lua 5.2's `package.searchpath()` function that does not
--- require the package module to be loaded.
-local function searchpath(name, path)
-  local tried = {}
-  for part in path:gmatch('[^;]+') do
-    local filename = part:gsub('%?', name)
-    local ok, errmsg = loadfile(filename)
-    if ok or not errmsg:find('cannot open') then return filename end
-    tried[#tried + 1] = string.format("no file '%s'", filename)
-  end
-  return nil, table.concat(tried, '\n')
-end
 
 ---
 -- Map of color name strings to color values in `0xBBGGRR` or `"#RRGGBB"` format.
@@ -1467,10 +1445,13 @@ function M.load(name, alt_name, cache)
   -- `property_expanded` tables do not exist (they are not useful). Create them in order prevent
   -- errors from occurring.
   if not M.property then
-    M.property = setmetatable({['lexer.lpeg.home'] = package.path:gsub('/%?%.lua', '')}, {
-      __index = function() return '' end,
-      __newindex = function(t, k, v) rawset(t, k, tostring(v)) end
-    })
+    M.property = setmetatable(
+    	{}
+    	,{
+      	__index = function() return '' end,
+      	__newindex = function(t, k, v) rawset(t, k, tostring(v)) end
+    	}
+    )
     M.property_int = setmetatable({}, {
       __index = function(t, k) return tonumber(M.property[k]) or 0 end,
       __newindex = function() error('read-only property') end
@@ -1488,8 +1469,7 @@ function M.load(name, alt_name, cache)
   -- whitespace style names. Note that loading embedded lexers changes `WHITESPACE` again,
   -- so when adding it later, do not reference the potentially incorrect value.
   M.WHITESPACE = (alt_name or name) .. '_whitespace'
-  local path = M.property['lexer.lpeg.home']:gsub(';', '/?.lua;') .. '/?.lua'
-  local lexer = dofile(assert(searchpath('lexers/'..name, path)))
+  local lexer = require("lexers/" .. name)
   assert(lexer, string.format("'%s.lua' did not return a lexer", name))
   if alt_name then lexer._NAME = alt_name end
   if not getmetatable(lexer) or lexer._LEGACY then
