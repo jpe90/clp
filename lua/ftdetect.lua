@@ -594,8 +594,8 @@ ftdetect.lookup_lexer = function(filename)
 		end
 
 		-- try text lexer as a last resort
-		return 'text'
 	end
+	return 'text'
 end
 
 return ftdetect
