@@ -36,6 +36,7 @@ function write(args)
 	else
 		write_nohl(text, lexer)
 	end
+	reset_colors()
 	file:close()
 end
 
