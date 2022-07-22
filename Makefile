@@ -37,6 +37,8 @@ uninstall:
 	@rm -f ${DESTDIR}${PREFIX}/bin/clp
 	@echo removing manual pages from ${DESTDIR}${MANPREFIX}/man1
 	@rm -f ${DESTDIR}${MANPREFIX}/man1/clp.1
+	@echo removing support files from ${DESTDIR}${SHAREPREFIX}/clp
+	@rm -rf ${DESTDIR}${SHAREPREFIX}/clp
 
 clean:
 	rm clp
