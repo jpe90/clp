@@ -24,7 +24,7 @@ local default_theme = {
 	['type'] = colors.green .. colors.bright,
 	['variable'] = colors.blue .. colors.bright,
 	['whitespace'] =  '',
-	['embedded'] = colors.onblue .. colors.bright,
+	['embedded'] = colors.magenta .. colors.bright,
 	['identifier'] = colors.white,
 }
 
