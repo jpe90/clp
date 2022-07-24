@@ -7,9 +7,29 @@ local lexers = require('lexer')
 local default_theme = theme.default_theme
 local highlight_theme = theme.highlight_theme
 
+local function copy_table(t)
+	local t2 = {}
+	for k, v in pairs(t) do
+		t2[k] = v
+	end
+	return t2
+end
+
+function expand_theme(theme, lexer)
+	local extra_styles = lexer._EXTRASTYLES
+	local expanded_table = copy_table(theme)
+	for k, v in pairs(extra_styles) do
+		local copied_style_name = string.match(v,"%.(.-)%)")
+		local copied_style = theme[copied_style_name]
+		expanded_table[k] = copied_style
+	end
+	return expanded_table
+end
+
 function write(args)
 	local filename = args.filename
 	local highlight_line = args.highlight_line
+	local filetype_override = args.filetype_override
 	local file = assert(io.open(filename, 'r'))
 	local text = file:read('*all')
 	local syntax
@@ -20,6 +40,7 @@ function write(args)
 		syntax = ftdetect.lookup_lexer(filename)
 	end
 	local lexer = lexers.load(syntax)
+	local lang_theme = expand_theme(default_theme, lexer)
 	if not lexer then
 		print(string.format('Failed to load lexer: `%s`', syntax))
 		return 1
@@ -32,16 +53,16 @@ function write(args)
 		hl_start_pos, hl_end_pos = find_hl_bounds(text, highlight_line)
 	end
 	if (hl_start_pos ~= nil) then
-		write_hl(text, lexer, hl_start_pos, hl_end_pos)
+		write_hl(text, lexer, hl_start_pos, hl_end_pos, lang_theme)
 	else
-		write_nohl(text, lexer)
+		write_nohl(text, lexer, lang_theme)
 	end
 	reset_colors()
 	file:close()
 end
 
-function write_nohl(text, lexer)
-	write_text(text,lexer,default_theme)
+function write_nohl(text, lexer, theme)
+	write_text(text,lexer,theme)
 end
 
 function reset_colors()
@@ -76,15 +97,15 @@ function find_hl_bounds(s, n)
 	return nil
 end
 
-function write_hl(text, lexer, hl_line_start, hl_line_end)
+function write_hl(text, lexer, hl_line_start, hl_line_end, lang_theme)
 	local pre_hl = text:sub(0, hl_line_start)
 	local hl = text:sub(hl_line_start, hl_line_end)
 	hl = hl:gsub("\n", "")
 	local post_hl = text:sub(hl_line_end, nil)
-	write_text(pre_hl, lexer, default_theme)
+	write_text(pre_hl, lexer, lang_theme)
 	if (hl ~= nil) then write_text(hl, lexer, highlight_theme) end
 	reset_colors()
-	if (post_hl ~= nil) then write_text(post_hl, lexer, default_theme) end
+	if (post_hl ~= nil) then write_text(post_hl, lexer, lang_theme) end
 end
 
 -- https://github.com/martanne/vis/issues/601#issuecomment-327018674
@@ -122,3 +143,4 @@ function print_available_overrides()
 end
 
 return clp
+
