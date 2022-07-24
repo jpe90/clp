@@ -27,7 +27,7 @@ function write(args)
 
 	-- if a line was set to be highlighted, make sure it has valid bounds and
 	-- then highlight it. Otherwise just write normally to stdout.
-	local hl_line_start, hl_line_end
+	local hl_start_pos, hl_end_pos
 	if (highlight_line ~= nil and highlight_line > 0) then
 		hl_start_pos, hl_end_pos = find_hl_bounds(text, highlight_line)
 	end
