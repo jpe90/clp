@@ -52,11 +52,11 @@ make a very perceptible difference. Quick benchmarks on my machine (clp
 installed with LuaJIT, highlighting
 [sqlite3.c](https://fossies.org/linux/sqlite/sqlite3.c))
 
-```
-time clp sqlite3.c > /dev/null                   # 276.75 millis
-time bat --color=always -p sqlite3.c > /dev/null # 3.06 secs
-time source-highlight sqlite3.c > /dev/null      # 4.71 secs
-```
+| Command | Mean [ms] | Min [ms] | Max [ms] | Relative |
+|:---|---:|---:|---:|---:|
+| `clp sqlite3.c` | 216.6 ± 2.4 | 212.2 | 220.8 | 1.00 |
+| `bat --color=always sqlite3.c` | 3161.0 ± 12.3 | 3149.7 | 3182.7 | 14.59 ± 0.17 |
+| `source-highlight sqlite3.c` | 4313.6 ± 25.5 | 4277.7 | 4355.9 | 19.91 ± 0.25 |
 
 Parsers are upstreamed from the
 [Scintillua](https://orbitalquark.github.io/scintillua/) project. It's actively
