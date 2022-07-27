@@ -30,6 +30,18 @@ $ make
 # make install
 ```
 
+#### Distro Specific Dependencies
+
+##### Ubuntu
+```
+# apt-get install -y build-essential pkg-config luajit lua-lpeg
+```
+
+##### Arch
+```
+# pacman -S --needed --noconfirm base-devel pkg-config luajit lua51-lpeg
+```
+
 ## Usage
 
 ```
