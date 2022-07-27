@@ -277,7 +277,7 @@ for liblua in luajit lua lua5.4 lua5.3 lua5.2 lua-5.3 lua-5.2 lua54 lua53 lua52;
 	fi
 
 	if test $? -eq 0 && $CC $CFLAGS $CFLAGS_LUA "$tmpc" \
-		$LDFLAGS $LDFLAGS_LUA -o "$tmpo" >horse.txt 2>&1 ; then
+		$LDFLAGS $LDFLAGS_LUA -o "$tmpo" >/dev/null 2>&1 ; then
 		have_lua="yes"
 		printf "yes\n"
 		check_lpeg $CFLAGS_LUA $LDFLAGS_LUA
