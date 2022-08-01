@@ -1,8 +1,10 @@
 # clp
 
-clp writes input files to stdout with syntax highlighting.
+clp writes input files to stdout with syntax highlighting. I wrote it to fill fzf's preview window.
 It aims to be relatively fast, provide wide language support, and be easy
 to extend with new languages. It currently supports 150 languages.
+
+![clpm](https://github.com/jpe90/images/raw/master/clpm.png)
 
 Language support is implemented with LPEG, a tool developed by PUC which uses
 parsing expression grammars to improve upon traditional regex parsers
@@ -58,9 +60,9 @@ Highlight a non-blank line
 
 ## Motivation
 
-clp runs faster than other command line syntax highlighting programs. When used
-as a previewer for a fuzzy finder in a project with large source files, it can
-make a very perceptible difference. Quick benchmarks on my machine (clp
+I intended clp to fill fzf's preview window, so I wanted it to be fast and support a large number of languages.
+
+Here are some quick benchmarks comparing similar programs running on my machine (clp
 installed with LuaJIT, highlighting
 [sqlite3.c](https://fossies.org/linux/sqlite/sqlite3.c))
 
