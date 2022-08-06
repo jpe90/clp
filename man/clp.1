@@ -16,8 +16,7 @@ See below.
 .HP
 \fB\-t\fR, \fB\-\-override\-filetype\fR {filetype}
 .IP
-Force a language's syntax for highlighting the file. To see available filetypes, run \fBclp \-\-list\-overrides\fR\
-.
+Force a language's syntax for highlighting the file. To see available filetypes, run \fBclp \-\-list\-overrides\fR
 .HP
 \fB\-h\fR, \fB\-\-highlight\-line\fR {number}
 .IP
@@ -25,21 +24,17 @@ Highlight a non-blank line
 .SH CONFIGURATION
 \fBclp\fR is configured by the \fBclprc.lua\fR file described in the \fBFILES\fR section.
 .HP
-To use a light color theme, set clprc.custom_theme = "light"
+If your terminal uses a light background, set clprc.custom_theme = "light"
 .SH FILES
 Upon startup
 .Nm
-will source the first
-\fBclprc.lua\fR
-configuration file found from these locations.
+will source the first \fBclprc.lua\fR configuration file found from these locations.
 .Bl -bullet
 .IP \[bu] 2
 \fB$CLP_PATH\fR if set or \fB/usr/local/share/clp\fR or if not
 .IP \[bu] 2
 The source directory where the project was built (when built from source)
 .IP \[bu] 2
-\fB$XDG_CONFIG_HOME/clp\fR
-where
-\fBXDG_CONFIG_HOME\fR refers to \fB$HOME/.config\fR if\fBXDG_CONFIG_HOME\fR not set
+\fB$XDG_CONFIG_HOME/clp\fR or \fB$HOME/.config\fR if \fBXDG_CONFIG_HOME\fR is not set
 .HP
 When creating a new \fBclprc.lua\fR be sure to copy the structure from here.
