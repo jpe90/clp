@@ -1,19 +1,11 @@
 clp = {}
 
-local theme = require('theme')
-local colors = require('colors')
+local colors = require('style')
 local ftdetect = require('ftdetect')
 local lexers = require('lexer')
-local default_theme = theme.default_theme
-local highlight_theme = theme.highlight_theme
-
-local function copy_table(t)
-	local t2 = {}
-	for k, v in pairs(t) do
-		t2[k] = v
-	end
-	return t2
-end
+local syntax_highlight_style = colors.syntax_highlight_style
+local highlighted_line_style = colors.line_highlight_style
+require('util')
 
 function expand_theme(theme, lexer)
 	local extra_styles = lexer._EXTRASTYLES
@@ -40,7 +32,7 @@ function write(args)
 		syntax = ftdetect.lookup_lexer(filename)
 	end
 	local lexer = lexers.load(syntax)
-	local lang_theme = expand_theme(default_theme, lexer)
+	local lang_theme = expand_theme(syntax_highlight_style, lexer)
 	if not lexer then
 		print(string.format('Failed to load lexer: `%s`', syntax))
 		return 1
@@ -66,7 +58,7 @@ function write_nohl(text, lexer, theme)
 end
 
 function reset_colors()
-	io.write(tostring(colors.reset))
+	io.write(tostring(colors.reset_sequence))
 end
 
 -- I think modifying the lexer code to track highlighting location could be
@@ -103,7 +95,7 @@ function write_hl(text, lexer, hl_line_start, hl_line_end, lang_theme)
 	hl = hl:gsub("\n", "")
 	local post_hl = text:sub(hl_line_end, nil)
 	write_text(pre_hl, lexer, lang_theme)
-	if (hl ~= nil) then write_text(hl, lexer, highlight_theme) end
+	if (hl ~= nil) then write_text(hl, lexer, highlighted_line_style) end
 	reset_colors()
 	if (post_hl ~= nil) then write_text(post_hl, lexer, lang_theme) end
 end
