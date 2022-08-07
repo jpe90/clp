@@ -36,7 +36,7 @@ $ make
 
 ##### Ubuntu
 ```
-# apt-get install -y build-essential pkg-config luajit lua-lpeg
+# apt-get install -y build-essential pkg-config libluajit-5.1-dev lua-lpeg
 ```
 
 ##### Arch
