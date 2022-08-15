@@ -1,10 +1,11 @@
 clp = {}
 
-local colors = require('style')
+local style = require('style')
 local ftdetect = require('ftdetect')
 local lexers = require('lexer')
-local syntax_highlight_style = colors.syntax_highlight_style
-local highlighted_line_style = colors.line_highlight_style
+local ansi_codes = require('ansi_codes')
+local syntax_highlight_theme = style.theme
+local line_highlight_style = style.line_highlight_style
 require('util')
 
 function expand_theme(theme, lexer)
@@ -32,7 +33,10 @@ function write(args)
 		syntax = ftdetect.lookup_lexer(filename)
 	end
 	local lexer = lexers.load(syntax)
-	local lang_theme = expand_theme(syntax_highlight_style, lexer)
+	local lang_theme = expand_theme(syntax_highlight_theme, lexer)
+	if not lang_theme then
+		print(string.format('Failed to theme: `%s`', syntax))
+	end
 	if not lexer then
 		print(string.format('Failed to load lexer: `%s`', syntax))
 		return 1
@@ -58,11 +62,9 @@ function write_nohl(text, lexer, theme)
 end
 
 function reset_colors()
-	io.write(tostring(colors.reset_sequence))
+	io.write(tostring(ansi_codes.reset_sequence))
 end
 
--- I think modifying the lexer code to track highlighting location could be
--- more efficient, but this is a quick and dirty approach for now
 function find_hl_bounds(s, n)
 	local i = 0
 	local hl_start_pos
@@ -86,7 +88,6 @@ function find_hl_bounds(s, n)
 	else
 		return hl_start_pos, i
 	end
-	return nil
 end
 
 function write_hl(text, lexer, hl_line_start, hl_line_end, lang_theme)
@@ -95,13 +96,13 @@ function write_hl(text, lexer, hl_line_start, hl_line_end, lang_theme)
 	hl = hl:gsub("\n", "")
 	local post_hl = text:sub(hl_line_end, nil)
 	write_text(pre_hl, lexer, lang_theme)
-	if (hl ~= nil) then write_text(hl, lexer, highlighted_line_style) end
+	if (hl ~= nil) then write_text(hl, lexer, line_highlight_style) end
 	reset_colors()
 	if (post_hl ~= nil) then write_text(post_hl, lexer, lang_theme) end
 end
 
 -- https://github.com/martanne/vis/issues/601#issuecomment-327018674
-function write_text(text, lexer, style)
+function write_text(text, lexer, local_style)
 	local tokens = lexer:lex(text, 1)
 	local token_start = 1
 	local last = ''
@@ -110,7 +111,7 @@ function write_text(text, lexer, style)
 		local token_end = tokens[i + 1] - 1
 		local name = tokens[i]
 
-		local current_style = style[name]
+		local current_style = local_style[name]
 		if current_style ~= nil then
 			-- Whereas the lexer reports all other syntaxes over
 			-- the entire span of a token, it reports 'default'
@@ -123,6 +124,7 @@ function write_text(text, lexer, style)
 			last = name
 		end
 		io.write(text:sub(token_start, token_end))
+		reset_colors()
 		token_start = token_end + 1
 	end
 end

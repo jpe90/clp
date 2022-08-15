@@ -21,10 +21,6 @@ Force a language's syntax for highlighting the file. To see available filetypes,
 \fB\-h\fR, \fB\-\-highlight\-line\fR {number}
 .IP
 Highlight a non-blank line
-.SH CONFIGURATION
-\fBclp\fR is configured by the \fBclprc.lua\fR file described in the \fBFILES\fR section.
-.HP
-If your terminal uses a light background, set clprc.custom_theme = "light"
 .SH FILES
 Upon startup
 .Nm
@@ -38,3 +34,11 @@ The source directory where the project was built (when built from source)
 \fB$XDG_CONFIG_HOME/clp\fR or \fB$HOME/.config\fR if \fBXDG_CONFIG_HOME\fR is not set
 .HP
 When creating a new \fBclprc.lua\fR be sure to copy the structure from here.
+.SH CONFIGURATION
+\fBclp\fR is configured by the \fBclprc.lua\fR file described in the \fBFILES\fR section.
+.HP
+To change your colorscheme, set \fBclprc.theme = "{colorscheme name}"\fR in \fBclprc.lua\fR. A complete list of built-in colorschemes is available at \fBhttps://sr.ht/~eskin/clp/#setting-your-colorscheme\fR
+.HP
+Additional colorschemes can be installed to a "themes" folder in your clp configuration folder. For more information, see the README at \fBhttps://sr.ht/~eskin/clp/#configuration\fR
+
+

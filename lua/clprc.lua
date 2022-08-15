@@ -1,3 +1,3 @@
 clprc = {}
-clprc.custom_theme = "dark"
+clprc.theme = "ansi-16"
 return clprc

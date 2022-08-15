@@ -10,6 +10,8 @@ Language support is implemented with LPEG, a tool developed by PUC which uses
 parsing expression grammars to improve upon traditional regex parsers
 (described in depth in [this article](http://www.inf.puc-rio.br/~roberto/docs/peg.pdf)).
 
+More information is available [here](https://jeskin.net/blog/clp/), along with a blog post showing [how I use it with fzf](https://jeskin.net/blog/grep-fzf-clp/).
+
 ## Installation
 
 ### Homebrew
@@ -76,6 +78,33 @@ Parsers are upstreamed from the
 [Scintillua](https://orbitalquark.github.io/scintillua/) project. It's actively
 maintained, has great support even for niche languages, and easy to use
 relative to other syntax definition mechanisms.
+
+## Configuration
+
+`clp` can be configured in `~/.config/clp/clprc.lua`:
+
+```lua
+clprc = {}
+clprc.theme = "ansi-16"
+return clprc
+```
+
+### Setting your colorscheme
+
+To change your colorscheme, change the value of `clprc.theme` in `clprc.lua` to one of the following:
+
+### 3-bit ANSI theme
+- ansi-16
+
+### Truecolor themes
+- material
+- codedark
+- github_dark
+- github_light
+- gruvbox
+- tokyonight
+- sonokai
+- everforest
 
 ## Contributing
 
