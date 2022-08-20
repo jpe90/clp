@@ -1,14 +1,10 @@
 # clp
 
-clp writes input files to stdout with syntax highlighting. I wrote it to fill fzf's preview window.
-It aims to be relatively fast, provide wide language support, and be easy
-to extend with new languages. It currently supports 150 languages.
+clp writes input files to stdout with syntax highlighting. It aims to be relatively fast, provide wide language support, and be easy to extend with new languages. It currently supports 150 languages.
 
 ![clpm](https://github.com/jpe90/images/raw/master/clpm.png)
 
-Language support is implemented with LPEG, a tool developed by PUC which uses
-parsing expression grammars to improve upon traditional regex parsers
-(described in depth in [this article](http://www.inf.puc-rio.br/~roberto/docs/peg.pdf)).
+Language support is implemented with LPEG, a tool developed by PUC which uses parsing expression grammars to improve upon traditional regex parsers (described in depth in [this article](http://www.inf.puc-rio.br/~roberto/docs/peg.pdf)).
 
 More information is available [here](https://jeskin.net/blog/clp/), along with a blog post showing [how I use it with fzf](https://jeskin.net/blog/grep-fzf-clp/).
 
@@ -62,7 +58,7 @@ Highlight a non-blank line
 
 ## Motivation
 
-I intended clp to fill fzf's preview window, so I wanted it to be fast and support a large number of languages.
+Existing syntax highlighting programs are either relatively slow or support a small number of languages. `clp` aims to be faster without compromising on language support.
 
 Here are some quick benchmarks comparing similar programs running on my machine (clp
 installed with LuaJIT, highlighting
@@ -89,30 +85,11 @@ clprc.theme = "ansi-16"
 return clprc
 ```
 
-### Setting your colorscheme
+### Changing your colorscheme
 
-To change your colorscheme, change the value of `clprc.theme` in `clprc.lua` to one of the following:
-
-### 3-bit ANSI theme
-- ansi-16
-
-### Truecolor themes
-- material
-- codedark
-- github_dark
-- github_light
-- gruvbox
-- tokyonight
-- sonokai
-- everforest
+Instructions [available here](https://jeskin.net/blog/clp-color-themes/).
 
 ## Contributing
 
 Contributions are welcome! Feel free to send a pull request on [Github](https://github.com/jpe90/clp)
 or a patch on [Sourcehut](https://git.sr.ht/~eskin/clp).
-
-Here are some things that would be especially helpful:
-
-- Better interface for customizing color themes
-- Bugfixes
-- Code quality & performance improvements
