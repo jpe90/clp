@@ -1,7 +1,7 @@
 local M = {}
 
 local rgb_to_ansi = {}
--- https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters
+
 local sgr_params = {
     reset      = 0,
     clear      = 0,
@@ -76,10 +76,12 @@ local function ansi_string_24b(r,g,b)
 	return string.char(27) .."[38;2;"  ..  tostring(r) ..  ';' .. tostring(g)..  ';' .. tostring(b).. 'm'
 end
 
+M.begin_line_hl_ansi = string.char(27) .. "[47m" .. string.char(27) .. "[30m"
+M.end_line_hl_ansi = string.char(27) .. "[K" .. string.char(27) .. "[0m"
+
 M.ansi_string = ansi_string
 M.rgb_to_ansi = rgb_to_ansi
-M.sgr_params = sgr_params
-M.reset_sequence = ansi_string(sgr_params.reset)
+M.reset_sequence = ansi_string(0)
 M.hex_to_rgb = hex_to_rgb
 M.ansi_string_24b = ansi_string_24b
 M.ansi_string_4b = ansi_string_4b

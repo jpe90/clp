@@ -58,7 +58,7 @@ function write(args)
 end
 
 function write_nohl(text, lexer, theme)
-	write_text(text,lexer,theme)
+	write_styled(text,lexer,theme)
 end
 
 function reset_colors()
@@ -95,14 +95,15 @@ function write_hl(text, lexer, hl_line_start, hl_line_end, lang_theme)
 	local hl = text:sub(hl_line_start, hl_line_end)
 	hl = hl:gsub("\n", "")
 	local post_hl = text:sub(hl_line_end, nil)
-	write_text(pre_hl, lexer, lang_theme)
-	if (hl ~= nil) then write_text(hl, lexer, line_highlight_style) end
-	reset_colors()
-	if (post_hl ~= nil) then write_text(post_hl, lexer, lang_theme) end
+	write_styled(pre_hl, lexer, lang_theme)
+	if (hl ~= nil) then
+		io.write(ansi_codes.begin_line_hl_ansi .. hl .. ansi_codes.end_line_hl_ansi)
+	end
+	if (post_hl ~= nil) then write_styled(post_hl, lexer, lang_theme) end
 end
 
 -- https://github.com/martanne/vis/issues/601#issuecomment-327018674
-function write_text(text, lexer, local_style)
+function write_styled(text, lexer, local_style)
 	local tokens = lexer:lex(text, 1)
 	local token_start = 1
 	local last = ''
