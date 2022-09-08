@@ -87,7 +87,7 @@ return clprc
 
 ### Changing your colorscheme
 
-Instructions [available here](https://jeskin.net/blog/clp-color-themes/).
+Instructions [available here](https://jeskin.net/blog/clp/#adding-color-themes).
 
 ## Contributing
 
