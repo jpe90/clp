@@ -70,6 +70,8 @@ installed with LuaJIT, highlighting
 | `bat --color=always sqlite3.c` | 3161.0 ± 12.3 | 3149.7 | 3182.7 | 14.59 ± 0.17 |
 | `source-highlight sqlite3.c` | 4313.6 ± 25.5 | 4277.7 | 4355.9 | 19.91 ± 0.25 |
 
+More benchmarks are available [here](https://github.com/sharkdp/bat/blob/master/doc/alternatives.md)
+
 Parsers are upstreamed from the
 [Scintillua](https://orbitalquark.github.io/scintillua/) project. It's actively
 maintained, has great support even for niche languages, and easy to use
