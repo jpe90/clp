@@ -14,7 +14,7 @@ More information is available [here](https://jeskin.net/blog/clp/), along with a
 
 ```
 brew tap jpe90/clp
-brew install clp
+brew install jpe90/clp/clp
 ```
 
 ### Building from source
