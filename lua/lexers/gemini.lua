@@ -1,48 +1,27 @@
--- Copyright 2006-2017 Mitchell mitchell.att.foicica.com. See LICENSE.
--- Markdown LPeg lexer.
--- Copyright 2020 Haelwenn (lanodan) Monnier <contact+gemini.lua@hacktivis.me>
+-- Copyright 2020-2023 Haelwenn (lanodan) Monnier <contact+gemini.lua@hacktivis.me>. See LICENSE.
 -- Gemini / Gemtext LPeg lexer.
 -- See https://gemini.circumlunar.space/docs/specification.html
+local lexer = lexer
+local P, S = lpeg.P, lpeg.S
 
-local l = require('lexer')
-local token, word_match = l.token, l.word_match
-local P, R, S = lpeg.P, lpeg.R, lpeg.S
+local lex = lexer.new(...)
 
-local M = {_NAME = 'gemini'}
+local header = lex:tag(lexer.HEADING .. '.h3',
+                       lexer.to_eol(lexer.starts_line('###'))) +
+                   lex:tag(lexer.HEADING .. '.h2',
+                           lexer.to_eol(lexer.starts_line('##'))) +
+                   lex:tag(lexer.HEADING .. '.h1',
+                           lexer.to_eol(lexer.starts_line('#')))
+lex:add_rule('header', header)
 
-local ws = token(l.WHITESPACE, S(' \t')^1 + S('\v\r\n')^1)
+lex:add_rule('list', lex:tag(lexer.LIST, lexer.to_eol(lexer.starts_line('*'))))
 
-local link = token('link', l.starts_line('=>') * l.nonnewline^0)
+lex:add_rule('blockquote',
+             lex:tag(lexer.STRING, lexer.to_eol(lexer.starts_line('>'))))
 
--- Should only match ``` at start of line
-local pre = token('pre', l.delimited_range('```', false, true))
+lex:add_rule('pre',
+             lex:tag(lexer.CODE, lexer.to_eol(lexer.range('```', false, true))))
 
-local header = token('h3', l.starts_line('###') * l.nonnewline^0) +
-               token('h2', l.starts_line('##') * l.nonnewline^0) +
-               token('h1', l.starts_line('#') * l.nonnewline^0)
+lex:add_rule('link', lex:tag(lexer.LINK, lexer.to_eol(lexer.starts_line('=>'))))
 
-local list = token('list', l.starts_line('*') * l.nonnewline^0)
-
-local blockquote = token(l.STRING, l.starts_line('>') * l.nonnewline^0)
-
-M._rules = {
-  {'header', header},
-  {'list', list},
-  {'blockquote', blockquote},
-  {'pre', pre},
-  {'whitespace', ws},
-  {'link', link}
-}
-
-local font_size = 10
-local hstyle = 'fore:red'
-M._tokenstyles = {
-  h3 = hstyle..',size:'..(font_size + 3),
-  h2 = hstyle..',size:'..(font_size + 4),
-  h1 = hstyle..',size:'..(font_size + 5),
-  pre = l.STYLE_EMBEDDED..',eolfilled',
-  link = 'underlined',
-  list = l.STYLE_CONSTANT
-}
-
-return M
+return lex

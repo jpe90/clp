@@ -1,4 +1,3 @@
--- Copyright 2006-2022 Mitchell. See LICENSE.
+-- Copyright 2006-2023 Mitchell. See LICENSE.
 -- Null LPeg lexer.
-
 return require('lexer').new('null')
