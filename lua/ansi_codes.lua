@@ -3,36 +3,36 @@ local M = {}
 local rgb_to_ansi = {}
 
 local sgr_params = {
-    reset      = 0,
-    clear      = 0,
-    default    = 0,
-    bright     = 1,
-    dim        = 2,
-	italic     = 3,
+    reset = 0,
+    clear = 0,
+    default = 0,
+    bright = 1,
+    dim = 2,
+    italic = 3,
     underscore = 4,
-    blink      = 5,
-    reverse    = 7,
-    hidden     = 8,
+    blink = 5,
+    reverse = 7,
+    hidden = 8,
 
-	-- foreground
-    black      = 30,
-    red        = 31,
-    green      = 32,
-    yellow     = 33,
-    blue       = 34,
-    magenta    = 35,
-    cyan       = 36,
-    white      = 37,
+    -- foreground
+    black = 30,
+    red = 31,
+    green = 32,
+    yellow = 33,
+    blue = 34,
+    magenta = 35,
+    cyan = 36,
+    white = 37,
 
     -- background
-    onblack    = 40,
-    onred      = 41,
-    ongreen    = 42,
-    onyellow   = 43,
-    onblue     = 44,
-    onmagenta  = 45,
-    oncyan     = 46,
-    onwhite    = 47,
+    onblack = 40,
+    onred = 41,
+    ongreen = 42,
+    onyellow = 43,
+    onblue = 44,
+    onmagenta = 45,
+    oncyan = 46,
+    onwhite = 47
 }
 
 local function hex_to_rgb(hex)
@@ -59,21 +59,22 @@ end
 -- converts a SGR parameter to an ANSI escape string
 -- https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
 local function ansi_string_4b(color)
-	local ansi_code = ""
-	for attr, value in pairs(color) do
-		if attr == "color" then
-    		ansi_code = ansi_code .. ansi_string(sgr_params[value])
-		else
-    		print('error in 4 bit color value')
-		end
-	end
-	return ansi_code
+    local ansi_code = ""
+    for attr, value in pairs(color) do
+        if attr == "color" then
+            ansi_code = ansi_code .. ansi_string(sgr_params[value])
+        else
+            print('error in 4 bit color value')
+        end
+    end
+    return ansi_code
 end
 
 -- converts a SGR parameter to an ANSI escape string
 -- https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
-local function ansi_string_24b(r,g,b)
-	return string.char(27) .."[38;2;"  ..  tostring(r) ..  ';' .. tostring(g)..  ';' .. tostring(b).. 'm'
+local function ansi_string_24b(r, g, b)
+    return string.char(27) .. "[38;2;" .. tostring(r) .. ';' .. tostring(g) ..
+               ';' .. tostring(b) .. 'm'
 end
 
 M.begin_line_hl_ansi = string.char(27) .. "[47m" .. string.char(27) .. "[30m"

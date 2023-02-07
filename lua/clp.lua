@@ -8,13 +8,15 @@ local syntax_highlight_theme = style.theme
 local line_highlight_style = style.line_highlight_style
 require('util')
 
+-- TODO: the logic in here changed in scintillua_6
+--            investigate if this is still (or was ever) needed
 function expand_theme(theme, lexer)
-	local extra_styles = lexer._EXTRASTYLES
+	local extra_styles = lexer._extra_tags
 	local expanded_table = copy_table(theme)
 	for k, v in pairs(extra_styles) do
-		local copied_style_name = string.match(v,"%.(.-)%)")
-		local copied_style = theme[copied_style_name]
-		expanded_table[k] = copied_style
+		-- local copied_style_name = string.match(v,"%.(.-)%)")
+		-- local copied_style = theme[copied_style_name]
+		-- expanded_table[k] = copied_style
 	end
 	return expanded_table
 end

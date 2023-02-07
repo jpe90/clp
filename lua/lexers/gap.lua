@@ -1,6 +1,5 @@
--- Copyright 2006-2022 Mitchell. See LICENSE.
+-- Copyright 2006-2023 Mitchell. See LICENSE.
 -- Gap LPeg lexer.
-
 local lexer = require('lexer')
 local token, word_match = lexer.token, lexer.word_match
 local P, S = lpeg.P, lpeg.S
@@ -8,13 +7,13 @@ local P, S = lpeg.P, lpeg.S
 local lex = lexer.new('gap')
 
 -- Whitespace.
-lex:add_rule('whitespace', token(lexer.WHITESPACE, lexer.space^1))
+lex:add_rule('whitespace', token(lexer.WHITESPACE, lexer.space ^ 1))
 
 -- Keywords.
-lex:add_rule('keyword', token(lexer.KEYWORD, word_match{
-  'and', 'break', 'continue', 'do', 'elif', 'else', 'end', 'fail', 'false', 'fi', 'for', 'function',
-  'if', 'in', 'infinity', 'local', 'not', 'od', 'or', 'rec', 'repeat', 'return', 'then', 'true',
-  'until', 'while'
+lex:add_rule('keyword', token(lexer.KEYWORD, word_match {
+    'and', 'break', 'continue', 'do', 'elif', 'else', 'end', 'fail', 'false',
+    'fi', 'for', 'function', 'if', 'in', 'infinity', 'local', 'not', 'od', 'or',
+    'rec', 'repeat', 'return', 'then', 'true', 'until', 'while'
 }))
 
 -- Identifiers.
@@ -39,6 +38,7 @@ lex:add_fold_point(lexer.KEYWORD, 'function', 'end')
 lex:add_fold_point(lexer.KEYWORD, 'do', 'od')
 lex:add_fold_point(lexer.KEYWORD, 'if', 'fi')
 lex:add_fold_point(lexer.KEYWORD, 'repeat', 'until')
-lex:add_fold_point(lexer.COMMENT, lexer.fold_consecutive_lines('#'))
+
+lexer.property['scintillua.comment'] = '#'
 
 return lex
