@@ -10,6 +10,7 @@
 #include <pwd.h>
 #include <libgen.h>
 #include <signal.h>
+#include <sys/stat.h>
 
 #define OPTPARSE_IMPLEMENTATION
 #include "optparse.h"
@@ -176,8 +177,17 @@ int main(int argc, char *argv[]) {
 
 	filename = optparse_arg(&options);
 
-	if (!filename) {
-		printf("Usage: clp [options] file\n");
+	struct stat buf;
+
+	if (stat(filename, &buf) == -1) {
+		/* stat failed, file does not exist or is inaccessible */
+		perror("stat");
+		return 1;
+	}
+
+	if (!S_ISREG(buf.st_mode)) {
+		/* file exists but is not a regular file */
+		printf("%s is not a regular file\n", argv[1]);
 		return 1;
 	}
 
