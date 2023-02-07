@@ -13,6 +13,7 @@ ftdetect.filetypes = {
     asm = {ext = {"%.asm$", "%.ASM$", "%.s$", "%.S$"}},
     asp = {ext = {"%.asa$", "%.asp$", "%.hta$"}},
     autoit = {ext = {"%.au3$", "%.a3x$"}},
+    autohotkey = {ext = {"%.ahk$"}},
     awk = {
         hashbang = {"^/usr/bin/[mng]awk%s+%-f"},
         utility = {"^[mgn]?awk$", "^goawk$"},
