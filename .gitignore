@@ -55,3 +55,7 @@ tags
 .DS_Store
 clp
 config.mk
+
+.cache/*
+tests/tests
+sqlite3.c

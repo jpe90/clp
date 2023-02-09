@@ -1,18 +1,16 @@
 local ansi_codes = require('ansi_codes')
 local style = {}
 local ansi_colors = {}
-local clprc = require('clprc')
-local selected_theme_name = clprc.theme
-local selected_theme_path = 'themes/' .. selected_theme_name
-local theme = require(selected_theme_path).theme
 local theme_escape_codes = {}
 
-for token, color in pairs(theme) do
-    if type(color) == 'table' then
-        theme_escape_codes[token] = ansi_codes.ansi_string_4b(color)
-    elseif color:sub(1, 1) == '#' then
-        local r, g, b = ansi_codes.hex_to_rgb(color)
-        theme_escape_codes[token] = ansi_codes.ansi_string_24b(r, g, b)
+function init_style(theme)
+    for token, color in pairs(theme) do
+        if type(color) == 'table' then
+            theme_escape_codes[token] = ansi_codes.ansi_string_4b(color)
+        elseif color:sub(1, 1) == '#' then
+            local r, g, b = ansi_codes.hex_to_rgb(color)
+            theme_escape_codes[token] = ansi_codes.ansi_string_24b(r, g, b)
+        end
     end
 end
 
@@ -42,5 +40,7 @@ local line_highlight_style = {
 
 style.line_highlight_style = line_highlight_style
 style.theme = theme_escape_codes
+style.init_style = init_style
 
 return style
+

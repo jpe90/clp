@@ -1,23 +1,33 @@
 -include config.mk
 
+CFLAGS = $(CFLAGS_DEBUG)
 CFLAGS             += -Wall -pedantic
 CFLAGS 			   += -I $(CURDIR)/include
 CFLAGS             += $(CFLAGS_LUA)
-CFLAGS             += $(CFLAGS_AUTO)
 CFLAGS             += -DCLP_PATH=\"${SHAREPREFIX}/clp\"
 CFLAGS             += -DSRC_LUA_PATH=\"${ABS_SRCDIR}/lua\"
 LDFLAGS             = $(LDFLAGS_LUA)
-LDFLAGS            += $(LDFLAGS_AUTO)
+
 SRC                 = clp.c
 ELF                 = clp
+TEST_SRC            = tests/tests.c
+TEST_ELF            = tests/tests
 
 ALL: $(ELF)
 
 config.mk:
 	@touch $@
 
-clp: config.mk clp.c
-	$(CC) $(SRC) $(CFLAGS) $(LDFLAGS) -o clp
+clp: config.mk clp.o cli.c
+	$(CC) cli.c $(CFLAGS) $(LDFLAGS) clp.o -o clp
+
+$(TEST_ELF): clp.o $(TEST_SRC)
+	$(CC) $(TEST_SRC) $(CFLAGS) $(LDFLAGS) $(CFLAGS_PCRE2) $(LDFLAGS_PCRE2) clp.o -o $(TEST_ELF)
+
+.PHONY: tests
+
+tests: $(TEST_ELF)
+	./$(TEST_ELF)
 
 install: $(ELF)
 	@echo installing executable files to ${DESTDIR}${PREFIX}/bin
@@ -42,4 +52,7 @@ uninstall:
 	@rm -rf ${DESTDIR}${SHAREPREFIX}/clp
 
 clean:
-	rm clp
+	rm -f clp $(TEST_ELF) *.o
+
+clp.o: clp.c
+	$(CC) -c clp.c $(CFLAGS) -o clp.o

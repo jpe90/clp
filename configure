@@ -1,93 +1,98 @@
 #!/bin/sh
 # Based on the configure script from musl libc, MIT licensed
 
-usage () {
-cat <<EOF
+usage() {
+	cat <<EOF
 Usage: $0 [OPTION]... [VAR=VALUE]...
 
 To assign environment variables (e.g., CC, CFLAGS...), specify them as
-VAR=VALUE.  See below for descriptions of some of the useful variables.
+VAR=VALUE.	See below for descriptions of some of the useful variables.
 
 Defaults for the options are specified in brackets.
 
 Configuration:
-  --srcdir=DIR            source directory [detected]
+	--srcdir=DIR						source directory [detected]
 
 Installation directories:
-  --prefix=PREFIX         main installation prefix [/usr/local]
-  --exec-prefix=EPREFIX   installation prefix for executable files [PREFIX]
+	--prefix=PREFIX				 main installation prefix [/usr/local]
+	--exec-prefix=EPREFIX	 installation prefix for executable files [PREFIX]
 
 Fine tuning of the installation directories:
-  --bindir=DIR            user executables [EPREFIX/bin]
-  --sharedir=DIR          share directories [PREFIX/share]
-  --docdir=DIR            misc. documentation [PREFIX/share/doc]
-  --mandir=DIR            man pages [PREFIX/share/man]
+	--bindir=DIR						user executables [EPREFIX/bin]
+	--sharedir=DIR					share directories [PREFIX/share]
+	--docdir=DIR						misc. documentation [PREFIX/share/doc]
+	--mandir=DIR						man pages [PREFIX/share/man]
 
 Some influential environment variables:
-  CC                      C compiler command [detected]
-  CFLAGS                  C compiler flags [-Os -pipe ...]
-  LDFLAGS                 Linker flags
+	CC											C compiler command [detected]
+	CFLAGS									C compiler flags [-Os -pipe ...]
+	LDFLAGS								 Linker flags
 
 Use these variables to override the choices made by configure.
 
 EOF
-exit 0
+	exit 0
 }
 
 # helper functions
 
-
-quote () {
-tr '\n' ' ' <<EOF | grep '^[-[:alnum:]_=,./:]* $' >/dev/null 2>&1 && { echo "$1" ; return 0 ; }
+quote() {
+	tr '\n' ' ' <<EOF | grep '^[-[:alnum:]_=,./:]* $' >/dev/null 2>&1 && {
 $1
 EOF
-printf %s\\n "$1" | sed -e "s/'/'\\\\''/g" -e "1s/^/'/" -e "\$s/\$/'/" -e "s#^'\([-[:alnum:]_,./:]*\)=\(.*\)\$#\1='\2#"
+		echo "$1"
+		return 0
+	}
+	printf %s\\n "$1" | sed -e "s/'/'\\\\''/g" -e "1s/^/'/" -e "\$s/\$/'/" -e "s#^'\([-[:alnum:]_,./:]*\)=\(.*\)\$#\1='\2#"
 }
-echo () { printf "%s\n" "$*" ; }
-fail () { echo "$*" ; exit 1 ; }
-fnmatch () { eval "case \"\$2\" in $1) return 0 ;; *) return 1 ;; esac" ; }
-cmdexists () { type "$1" >/dev/null 2>&1 ; }
-trycc () { test -z "$CC" && cmdexists "$1" && CC=$1 ; }
-
-stripdir () {
-while eval "fnmatch '*/' \"\${$1}\"" ; do eval "$1=\${$1%/}" ; done
+echo() { printf "%s\n" "$*"; }
+fail() {
+	echo "$*"
+	exit 1
 }
+fnmatch() { eval "case \"\$2\" in $1) return 0 ;; *) return 1 ;; esac"; }
+cmdexists() { type "$1" >/dev/null 2>&1; }
+trycc() { test -z "$CC" && cmdexists "$1" && CC=$1; }
 
-tryflag () {
-printf "checking whether compiler accepts %s... " "$2"
-echo "typedef int x;" > "$tmpc"
-if $CC $CFLAGS_TRY $2 -c -o "$tmpo" "$tmpc" >/dev/null 2>&1 ; then
-printf "yes\n"
-eval "$1=\"\${$1} \$2\""
-eval "$1=\${$1# }"
-return 0
-else
-printf "no\n"
-return 1
-fi
+stripdir() {
+	while eval "fnmatch '*/' \"\${$1}\""; do eval "$1=\${$1%/}"; done
 }
 
-tryldflag () {
-printf "checking whether linker accepts %s... " "$2"
-echo "typedef int x;" > "$tmpc"
-if $CC $LDFLAGS_TRY -nostdlib -shared "$2" -o "$tmpo" "$tmpc" >/dev/null 2>&1 ; then
-printf "yes\n"
-eval "$1=\"\${$1} \$2\""
-eval "$1=\${$1# }"
-return 0
-else
-printf "no\n"
-return 1
-fi
+tryflag() {
+	printf "checking whether compiler accepts %s... " "$2"
+	echo "typedef int x;" >"$tmpc"
+	if $CC $CFLAGS_TRY $2 -c -o "$tmpo" "$tmpc" >/dev/null 2>&1; then
+		printf "yes\n"
+		eval "$1=\"\${$1} \$2\""
+		eval "$1=\${$1# }"
+		return 0
+	else
+		printf "no\n"
+		return 1
+	fi
+}
+
+tryldflag() {
+	printf "checking whether linker accepts %s... " "$2"
+	echo "typedef int x;" >"$tmpc"
+	if $CC $LDFLAGS_TRY -nostdlib -shared "$2" -o "$tmpo" "$tmpc" >/dev/null 2>&1; then
+		printf "yes\n"
+		eval "$1=\"\${$1} \$2\""
+		eval "$1=\${$1# }"
+		return 0
+	else
+		printf "no\n"
+		return 1
+	fi
 }
 
 check_lpeg() {
-printf "  checking for lpeg... "
-ccflags=$1
-shift
-llflags=$@
+	printf "	checking for lpeg... "
+	ccflags=$1
+	shift
+	llflags=$@
 
-cat > "$tmpc" <<EOF
+	cat >"$tmpc" <<EOF
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -102,15 +107,14 @@ int main() {
 }
 EOF
 
-if $CC $CFLAGS $ccflags "$tmpc" \
-	$LDFLAGS $llflags -o "$tmpo" >/dev/null 2>&1 ; then
-	eval $tmpo >/dev/null 2>&1
-	if test $? -eq 0 ; then
-		printf "yes\n"
-		return 1
+	if $CC $CFLAGS $ccflags "$tmpc" \
+		$LDFLAGS $llflags -o "$tmpo" >/dev/null 2>&1; then
+		eval $tmpo >/dev/null 2>&1
+		if test $? -eq 0; then
+			return 1
+		fi
 	fi
-fi
-return 0
+	return 0
 }
 
 # start of script
@@ -127,29 +131,29 @@ SHAREDIR='$(PREFIX)/share'
 DOCDIR='$(PREFIX)/share/doc'
 MANDIR='$(PREFIX)/share/man'
 
-for arg ; do
-case "$arg" in
---srcdir=*) SRCDIR=${arg#*=} ;;
---prefix=*) PREFIX=${arg#*=} ;;
---exec-prefix=*) EXEC_PREFIX=${arg#*=} ;;
---bindir=*) BINDIR=${arg#*=} ;;
---sharedir=*) SHAREDIR=${arg#*=} ;;
---docdir=*) DOCDIR=${arg#*=} ;;
---mandir=*) MANDIR=${arg#*=} ;;
---environment-only) environmentonly=yes ;;
---enable-*|--disable-*|--with-*|--without-*|--*dir=*|--build=*) ;;
--* ) echo "$0: unknown option $arg" ;;
-CC=*) CC=${arg#*=} ;;
-CFLAGS=*) CFLAGS=${arg#*=} ;;
-CPPFLAGS=*) CPPFLAGS=${arg#*=} ;;
-LDFLAGS=*) LDFLAGS=${arg#*=} ;;
-*=*) ;;
-*) ;;
-esac
+for arg; do
+	case "$arg" in
+	--srcdir=*) SRCDIR=${arg#*=} ;;
+	--prefix=*) PREFIX=${arg#*=} ;;
+	--exec-prefix=*) EXEC_PREFIX=${arg#*=} ;;
+	--bindir=*) BINDIR=${arg#*=} ;;
+	--sharedir=*) SHAREDIR=${arg#*=} ;;
+	--docdir=*) DOCDIR=${arg#*=} ;;
+	--mandir=*) MANDIR=${arg#*=} ;;
+	--environment-only) environmentonly=yes ;;
+	--enable-* | --disable-* | --with-* | --without-* | --*dir=* | --build=*) ;;
+	-*) echo "$0: unknown option $arg" ;;
+	CC=*) CC=${arg#*=} ;;
+	CFLAGS=*) CFLAGS=${arg#*=} ;;
+	CPPFLAGS=*) CPPFLAGS=${arg#*=} ;;
+	LDFLAGS=*) LDFLAGS=${arg#*=} ;;
+	*=*) ;;
+	*) ;;
+	esac
 done
 
-for i in SRCDIR PREFIX EXEC_PREFIX BINDIR SHAREDIR DOCDIR MANDIR ; do
-stripdir $i
+for i in SRCDIR PREFIX EXEC_PREFIX BINDIR SHAREDIR DOCDIR MANDIR; do
+	stripdir $i
 done
 
 have_pkgconfig=no
@@ -160,9 +164,9 @@ printf "%s\n" "$have_pkgconfig"
 #
 # Get the source dir for out-of-tree builds
 #
-if test -z "$SRCDIR" ; then
-SRCDIR="${0%/configure}"
-stripdir SRCDIR
+if test -z "$SRCDIR"; then
+	SRCDIR="${0%/configure}"
+	stripdir SRCDIR
 fi
 abs_builddir="$(pwd)" || fail "$0: cannot determine working directory"
 abs_srcdir="$(cd $SRCDIR && pwd)" || fail "$0: invalid source directory $SRCDIR"
@@ -174,11 +178,12 @@ test "$SRCDIR" != "." -a -f Makefile -a ! -h Makefile && fail "$0: Makefile alre
 #
 i=0
 set -C
-while : ; do i=$(($i+1))
-tmpc="./conf$$-$PPID-$i.c"
-tmpo="./conf$$-$PPID-$i.o"
-2>|/dev/null > "$tmpc" && break
-test "$i" -gt 50 && fail "$0: cannot create temporary file $tmpc"
+while :; do
+	i=$(($i + 1))
+	tmpc="./conf$$-$PPID-$i.c"
+	tmpo="./conf$$-$PPID-$i.o"
+	2>|/dev/null >"$tmpc" && break
+	test "$i" -gt 50 && fail "$0: cannot create temporary file $tmpc"
 done
 set +C
 trap 'rm -f "$tmpc" "$tmpo"' EXIT QUIT TERM HUP
@@ -192,15 +197,18 @@ trycc cc
 trycc gcc
 trycc clang
 printf "after checking %s\n" "$CC"
-test -n "$CC" || { echo "$0: cannot find a C compiler" ; exit 1 ; }
+test -n "$CC" || {
+	echo "$0: cannot find a C compiler"
+	exit 1
+}
 
 printf "checking whether C compiler works... "
-echo "typedef int x;" > "$tmpc"
-if output=$($CC $CPPFLAGS $CFLAGS -c -o "$tmpo" "$tmpc" 2>&1) ; then
-printf "yes\n"
+echo "typedef int x;" >"$tmpc"
+if output=$($CC $CPPFLAGS $CFLAGS -c -o "$tmpo" "$tmpc" 2>&1); then
+	printf "yes\n"
 else
-printf "no; compiler output follows:\n%s\n" "$output"
-exit 1
+	printf "no; compiler output follows:\n%s\n" "$output"
+	exit 1
 fi
 
 tryflag CFLAGS -pipe
@@ -208,18 +216,18 @@ tryflag CFLAGS -Wall
 tryflag CFLAGS -O2
 
 #dead code elimination
-tryflag   CFLAGS -ffunction-sections
-tryflag   CFLAGS -fdata-sections
+tryflag CFLAGS -ffunction-sections
+tryflag CFLAGS -fdata-sections
 tryldflag LDFLAGS -Wl,--gc-sections
 
 printf "creating config.mk... "
 
 cmdline=$(quote "$0")
-for i ; do cmdline="$cmdline $(quote "$i")" ; done
+for i; do cmdline="$cmdline $(quote "$i")"; done
 
 exec 3>&1 1>config.mk
 
-cat << EOF
+cat <<EOF
 # This version of config.mk was generated by:
 # $cmdline
 # Any changes made here will be lost if configure is re-run
@@ -234,10 +242,6 @@ SHAREPREFIX = $SHAREDIR
 CC = $CC
 CFLAGS = $CFLAGS
 LDFLAGS = $LDFLAGS
-CFLAGS_STD = $CFLAGS_STD
-LDFLAGS_STD = $LDFLAGS_STD
-CFLAGS_AUTO = $CFLAGS_AUTO
-LDFLAGS_AUTO = $LDFLAGS_AUTO
 CFLAGS_DEBUG = -U_FORTIFY_SOURCE -UNDEBUG -O0 -g3 -ggdb -Wall -Wextra -pedantic -Wno-missing-field-initializers -Wno-unused-parameter
 EOF
 exec 1>&3 3>&-
@@ -246,7 +250,7 @@ printf "done\n"
 
 printf "checking for liblua >= 5.1 ...\n"
 
-cat > "$tmpc" <<EOF
+cat >"$tmpc" <<EOF
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -268,7 +272,7 @@ have_lpeg="no"
 for liblua in luajit lua lua5.4 lua5.3 lua5.2 lua-5.3 lua-5.2 lua54 lua53 lua52; do
 	printf " checking for %s... " "$liblua"
 
-	if test "$have_pkgconfig" = "yes" ; then
+	if test "$have_pkgconfig" = "yes"; then
 		CFLAGS_LUA=$(pkg-config --cflags $liblua 2>/dev/null)
 		LDFLAGS_LUA=$(pkg-config --libs $liblua 2>/dev/null)
 	else
@@ -277,14 +281,14 @@ for liblua in luajit lua lua5.4 lua5.3 lua5.2 lua-5.3 lua-5.2 lua54 lua53 lua52;
 	fi
 
 	if test $? -eq 0 && $CC $CFLAGS $CFLAGS_LUA "$tmpc" \
-		$LDFLAGS $LDFLAGS_LUA -o "$tmpo" >/dev/null 2>&1 ; then
+		$LDFLAGS $LDFLAGS_LUA -o "$tmpo" >/dev/null 2>&1; then
 		have_lua="yes"
 		printf "yes\n"
 		check_lpeg $CFLAGS_LUA $LDFLAGS_LUA
 		has_lpeg=$?
 		if (test $has_lpeg -gt 0); then
 			have_lpeg="yes"
-			printf "yes"
+			printf "yes\n"
 			break
 		else
 			printf "no"
@@ -295,26 +299,41 @@ for liblua in luajit lua lua5.4 lua5.3 lua5.2 lua-5.3 lua-5.2 lua54 lua53 lua52;
 	printf "\n"
 done
 
-if test $have_lua = "no" ; then
+if test $have_lua = "no"; then
 	fail "Error: Lua was not found."
 fi
-if test $have_lpeg = "no" ; then
+if test $have_lpeg = "no"; then
 	fail "Error: Lua dependency LPEG was not found in any Lua installation."
+fi
+
+have_pcre2="no"
+CFLAGS_PCRE2=""
+LDFLAGS_PCRE2=""
+
+printf "checking for pcre2..."
+if pkg-config --exists check >/dev/null 2>&1; then
+	have_pcre2="yes"
+	CFLAGS_PCRE2=$(pkg-config --cflags libpcre2-8)
+	LDFLAGS_PCRE2=$(pkg-config --libs libpcre2-8)
+	echo "yes"
+else
+	echo "no"
 fi
 
 printf "completing config.mk... "
 
 exec 3>&1 1>>config.mk
 
-cat << EOF
+cat <<EOF
 CONFIG_HELP = $CONFIG_HELP
 CONFIG_LUA = $CONFIG_LUA
 CFLAGS_LUA = $CFLAGS_LUA
 LDFLAGS_LUA = $LDFLAGS_LUA
+CFLAGS_PCRE2 = $CFLAGS_PCRE2
+LDFLAGS_PCRE2 = $LDFLAGS_PCRE2
 EOF
 exec 1>&3 3>&-
 
 test "$SRCDIR" = "." || ln -sf $SRCDIR/Makefile .
 
 printf "done\n"
-
