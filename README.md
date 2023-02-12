@@ -24,6 +24,7 @@ Requirements:
 - a C99 Compiler
 - Lua >= 5.1 or LuaJIT (the latter for better performance)
 - [LPEG](http://www.inf.puc-rio.br/~roberto/lpeg/)
+- [luautf8](https://github.com/starwing/luautf8)
 ```
 $ ./configure
 $ make

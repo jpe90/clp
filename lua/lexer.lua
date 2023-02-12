@@ -788,6 +788,7 @@ local M = {}
 module('lexer')]=]
 
 local lpeg = _G.lpeg or require('lpeg') -- Scintillua's Lua environment defines _G.lpeg
+local utf8 = require('lua-utf8')
 local P, R, S, V, B = lpeg.P, lpeg.R, lpeg.S, lpeg.V, lpeg.B
 local Ct, Cc, Cp, Cmt, C = lpeg.Ct, lpeg.Cc, lpeg.Cp, lpeg.Cmt, lpeg.C
 
@@ -1617,10 +1618,10 @@ function M.load(name, alt_name)
         'tonumber',
         'tostring',
         'type',
-        'utf8',
         '_VERSION',
         lexer = ro_lexer,
         lpeg = lpeg, --
+        utf8 = utf8,
         require = function() return ro_lexer end -- legacy
     }
     for _, name in ipairs(env) do env[name] = _G[name] end
