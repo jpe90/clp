@@ -117,6 +117,38 @@ EOF
 	return 0
 }
 
+check_luautf8() {
+	printf "	checking for luautf8... "
+	ccflags=$1
+	shift
+	llflags=$@
+
+	cat >"$tmpc" <<EOF
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+#include <assert.h>
+
+int main() {
+	lua_State *L = luaL_newstate();
+	luaL_openlibs(L);
+	int reqRes = luaL_dostring(L, "local t=require('lua-utf8') return (t~=nil)");
+	assert(reqRes == 0);
+	return 0;
+}
+EOF
+
+	if $CC $CFLAGS $ccflags "$tmpc" \
+		$LDFLAGS $llflags -o "$tmpo" >/dev/null 2>&1; then
+		eval $tmpo >/dev/null 2>&1
+		if test $? -eq 0; then
+			return 1
+		fi
+	fi
+	return 0
+}
+
+
 # start of script
 
 CFLAGS_AUTO=
@@ -269,6 +301,7 @@ EOF
 
 have_lua="no"
 have_lpeg="no"
+have_luautf8="no"
 for liblua in luajit lua lua5.4 lua5.3 lua5.2 lua-5.3 lua-5.2 lua54 lua53 lua52; do
 	printf " checking for %s... " "$liblua"
 
@@ -289,9 +322,19 @@ for liblua in luajit lua lua5.4 lua5.3 lua5.2 lua-5.3 lua-5.2 lua54 lua53 lua52;
 		if (test $has_lpeg -gt 0); then
 			have_lpeg="yes"
 			printf "yes\n"
-			break
+		else
+			printf "no\n"
+		fi
+		check_luautf8 $CFLAGS_LUA $LDFLAGS_LUA
+		has_luautf8=$?
+		if (test $has_luautf8 -gt 0); then
+			have_luautf8="yes"
+			printf "yes\n"
 		else
 			printf "no"
+		fi
+		if (test $has_luautf8 -gt 0) && (test $has_lpeg -gt 0); then
+  			break
 		fi
 	else
 		printf "no"

@@ -1,6 +1,6 @@
 -include config.mk
 
-CFLAGS = $(CFLAGS_DEBUG)
+# CFLAGS = $(CFLAGS_DEBUG)
 CFLAGS             += -Wall -pedantic
 CFLAGS 			   += -I $(CURDIR)/include
 CFLAGS             += $(CFLAGS_LUA)
