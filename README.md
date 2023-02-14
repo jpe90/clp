@@ -10,12 +10,17 @@ More information is available [here](https://jeskin.net/blog/clp/), along with a
 
 ## Installation
 
-### Homebrew
+### MacOS
 
 ```
 brew tap jpe90/clp
 brew install jpe90/clp/clp
 ```
+
+### Linux
+
+[AUR](https://aur.archlinux.org/packages/clp-git)
+
 
 ### Building from source
 Requirements:
@@ -40,7 +45,7 @@ $ make
 
 ##### Arch
 ```
-# pacman -S --needed --noconfirm base-devel pkg-config luajit lua51-lpeg
+# pacman -S --needed --noconfirm base-devel pkg-config luajit lua51-lpeg lua51-luautf8
 ```
 
 ## Usage
