@@ -69,9 +69,9 @@ run_tests(const char *filename, const char *highlighted[],
         close(pipefd[0]);               // Close unused read end
         dup2(pipefd[1], STDOUT_FILENO); // Redirect stdout to pipe
         struct app app;
-        init_app(&app);
+        clp_init(&app);
         strcpy(app.filename, filename);
-        run_lua(&app);
+        clp_run(&app);
 
         close(pipefd[1]); // Close the write end of the pipe
     } else {
@@ -111,7 +111,7 @@ run_tests(const char *filename, const char *highlighted[],
     }
     return 0;
 }
-// include headers with lua_init and run_lua defs
+// include headers with lua_init and clp_run defs
 int
 main(int argc, char *argv[])
 {

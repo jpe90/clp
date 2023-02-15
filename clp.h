@@ -27,7 +27,7 @@
 #define SRC_LUA_PATH ""
 #endif
 
-struct app {
+struct clp_ctx {
     lua_State *L;
     char path[PATHMAX];
     struct {
@@ -41,18 +41,22 @@ struct app {
 
 void bail(lua_State *L, char *msg);
 
+void usage();
+
 int print_lua_path(lua_State *L);
 
 bool lua_path_add(lua_State *L, const char *path);
 
 bool lua_paths_get(lua_State *L, char **lpath, char **cpath);
 
-int lua_init(struct app *app);
+int lua_init(struct clp_ctx *ctx);
 
-int init_app(struct app *app);
+int clp_init(struct clp_ctx *ctx);
 
-int run_lua(struct app *app);
+int clp_open_file(struct clp_ctx *ctx, struct stat *buf, char *filename);
 
-void app_cleanup(struct app *app);
+int clp_run(struct clp_ctx *ctx);
+
+void clp_cleanup(struct clp_ctx *ctx);
 
 #endif /* CLP_H */

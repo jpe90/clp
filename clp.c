@@ -9,6 +9,16 @@ bail(lua_State *L, char *msg)
     exit(1);
 }
 
+void
+usage()
+{
+    printf("usage: clp <filename>\n\
+        [--highlight-line <line number>]\n\
+        [--override-filetype <filetype>]\n\
+        [--list-overrides]\n\
+        [--override-colortheme <colortheme>]\n");
+}
+
 int
 print_lua_path(lua_State *L)
 {
@@ -73,24 +83,27 @@ package_exists(lua_State *L, const char *name)
 }
 
 int
-lua_init(struct app *app)
+lua_init(struct clp_ctx *ctx)
 {
-    app->L = luaL_newstate();
-    luaL_openlibs(app->L);
+    ctx->L = luaL_newstate();
+    luaL_openlibs(ctx->L);
 
     return 0;
 }
 
 int
-init_app(struct app *app)
+clp_init(struct clp_ctx *ctx)
 {
-    lua_init(app);
-    if (!(app->L)) {
+    // should there be more initialization here? filename and stuff? does that
+    // belong in cli main? where does initialization actually take place in
+    // other programs?
+    lua_init(ctx);
+    if (!(ctx->L)) {
         return -1;
     }
-    lua_path_add(app->L, CLP_PATH);
+    lua_path_add(ctx->L, CLP_PATH);
     if (strcmp(SRC_LUA_PATH, "") != 0) {
-        lua_path_add(app->L, SRC_LUA_PATH);
+        lua_path_add(ctx->L, SRC_LUA_PATH);
     }
 
     char *home = getenv("HOME");
@@ -109,83 +122,101 @@ init_app(struct app *app)
             return 1;
         }
 
-        app->program_opts.highlight_line = -1;
-        app->program_opts.filetype_override = NULL;
-        app->program_opts.color_theme_override = NULL;
-        app->program_opts.print_available_overrides = false;
+        ctx->program_opts.highlight_line = -1;
+        ctx->program_opts.filetype_override = NULL;
+        ctx->program_opts.color_theme_override = NULL;
+        ctx->program_opts.print_available_overrides = false;
     }
 
     const char *xdg_config = getenv("XDG_CONFIG_HOME");
     if (xdg_config) {
-        snprintf(app->path, sizeof app->path, "%s/clp", xdg_config);
-        lua_path_add(app->L, app->path);
+        snprintf(ctx->path, sizeof ctx->path, "%s/clp", xdg_config);
+        lua_path_add(ctx->L, ctx->path);
     } else if (home && *home) {
-        snprintf(app->path, sizeof app->path, "%s/.config/clp", home);
-        lua_path_add(app->L, app->path);
+        snprintf(ctx->path, sizeof ctx->path, "%s/.config/clp", home);
+        lua_path_add(ctx->L, ctx->path);
     }
     return 0;
 }
 
 int
-run_lua(struct app *app)
+clp_open_file(struct clp_ctx *ctx, struct stat *buf, char *filename)
+{
+    if (stat(filename, buf) == -1) {
+        fprintf(stderr, "Unable to stat %s: ", filename);
+        perror(0);
+        fprintf(stderr, "Did you provide a valid file?");
+        return 1;
+    }
+
+    if (!S_ISREG(buf->st_mode)) {
+        fprintf(stderr, "%s exists but is not a regular file\n", filename);
+        return 1;
+    }
+    strcpy(ctx->filename, filename);
+    return 0;
+}
+
+int
+clp_run(struct clp_ctx *ctx)
 {
     int ret = 0;
-    if (app->program_opts.print_available_overrides) {
-        printf("in overrides\n");
-        lua_getglobal(app->L, "print_available_overrides");
-        ret = lua_pcall(app->L, 0, 0, 0);
-        if (ret != 0) {
-            fprintf(stderr, "%s\n", lua_tostring(app->L, -1));
-            return 1;
-        }
-        app_cleanup(app);
-    }
+
     int status = 0;
-    if (!package_exists(app->L, "clp")) {
+    if (!package_exists(ctx->L, "clp")) {
         fprintf(stderr, "ERROR: failed to load clp.lua\n");
         exit(1);
     }
 
-    lua_getglobal(app->L, "require");
-    lua_pushstring(app->L, "clp");
-    status = lua_pcall(app->L, 1, 1, 0);
+    lua_getglobal(ctx->L, "require");
+    lua_pushstring(ctx->L, "clp");
+    status = lua_pcall(ctx->L, 1, 1, 0);
     if (status != 0)
-        fprintf(stderr, "%s\n", lua_tostring(app->L, -1));
+        fprintf(stderr, "%s\n", lua_tostring(ctx->L, -1));
 
-    lua_getglobal(app->L, "write");
-    lua_newtable(app->L);
+    if (ctx->program_opts.print_available_overrides) {
+        lua_getglobal(ctx->L, "print_available_overrides");
+        ret = lua_pcall(ctx->L, 0, 0, 0);
+        if (ret != 0) {
+            fprintf(stderr, "error printing overrides: %s\n",
+                    lua_tostring(ctx->L, -1));
+            return 1;
+        }
+        return 0;
+    }
 
-    if (app->program_opts.filetype_override) {
-        lua_pushliteral(app->L, "filetype_override");
-        lua_pushstring(app->L, app->program_opts.filetype_override);
-        lua_settable(app->L, -3);
+    lua_getglobal(ctx->L, "write");
+    lua_newtable(ctx->L);
+
+    if (ctx->program_opts.filetype_override) {
+        printf("in ft override, see %s\n", ctx->program_opts.filetype_override);
+        lua_pushliteral(ctx->L, "filetype_override");
+        lua_pushstring(ctx->L, ctx->program_opts.filetype_override);
+        lua_settable(ctx->L, -3);
     }
-    if (app->program_opts.highlight_line >= 0) {
-        lua_pushliteral(app->L, "highlight_line");
-        lua_pushinteger(app->L, app->program_opts.highlight_line);
-        lua_settable(app->L, -3);
+    if (ctx->program_opts.highlight_line >= 0) {
+        lua_pushliteral(ctx->L, "highlight_line");
+        lua_pushinteger(ctx->L, ctx->program_opts.highlight_line);
+        lua_settable(ctx->L, -3);
     }
-    if (app->program_opts.color_theme_override) {
-        lua_pushliteral(app->L, "color_theme_override");
-        lua_pushstring(app->L, app->program_opts.color_theme_override);
-        lua_settable(app->L, -3);
+    if (ctx->program_opts.color_theme_override) {
+        lua_pushliteral(ctx->L, "color_theme_override");
+        lua_pushstring(ctx->L, ctx->program_opts.color_theme_override);
+        lua_settable(ctx->L, -3);
     }
-    lua_pushliteral(app->L, "filename");
-    lua_pushstring(app->L, app->filename);
-    lua_settable(app->L, -3);
-    ret = lua_pcall(app->L, 1, 0, 0);
+    lua_pushliteral(ctx->L, "filename");
+    lua_pushstring(ctx->L, ctx->filename);
+    lua_settable(ctx->L, -3);
+    ret = lua_pcall(ctx->L, 1, 0, 0);
     if (ret != 0) {
-        fprintf(stderr, "%s\n", lua_tostring(app->L, -1));
+        fprintf(stderr, "%s\n", lua_tostring(ctx->L, -1));
         return 1;
     }
-    lua_pushliteral(app->L, "filename");
-    lua_pushstring(app->L, app->filename);
-    lua_settable(app->L, -3);
     return ret;
 }
 
 void
-app_cleanup(struct app *app)
+clp_cleanup(struct clp_ctx *ctx)
 {
-    lua_close(app->L);
+    lua_close(ctx->L);
 }

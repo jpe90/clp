@@ -110,7 +110,7 @@ function write_hl(text, lexer, hl_line_start, hl_line_end, lang_theme)
         io.write(ansi_codes.begin_line_hl_ansi .. hl ..
                      ansi_codes.end_line_hl_ansi)
     end
-
+    if (post_hl ~= nil) then write_styled(post_hl, lexer, lang_theme) end
 end
 
 -- https://github.com/martanne/vis/issues/601#issuecomment-327018674
