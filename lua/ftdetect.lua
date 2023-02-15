@@ -96,6 +96,7 @@ ftdetect.filetypes = {
     inform = {ext = {"%.inf$", "%.ni$"}},
     ini = {ext = {"%.cfg$", "%.cnf$", "%.conf$", "%.inf$", "%.ini$", "%.reg$"}},
     io_lang = {ext = {"%.io$"}},
+    jai = {ext = {"%.jai$"}},
     java = {ext = {"%.bsh$", "%.java$"}},
     javascript = {
         ext = {

@@ -1803,6 +1803,7 @@ function M.detect(filename, line)
         reg = 'ini', --
         io = 'io_lang', --
         bsh = 'java',
+        jai = 'jai',
         java = 'java', --
         js = 'javascript',
         jsfl = 'javascript', --
