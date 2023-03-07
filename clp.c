@@ -94,9 +94,6 @@ lua_init(struct clp_ctx *ctx)
 int
 clp_init(struct clp_ctx *ctx)
 {
-    // should there be more initialization here? filename and stuff? does that
-    // belong in cli main? where does initialization actually take place in
-    // other programs?
     lua_init(ctx);
     if (!(ctx->L)) {
         return -1;
@@ -145,7 +142,7 @@ clp_open_file(struct clp_ctx *ctx, struct stat *buf, char *filename)
     if (stat(filename, buf) == -1) {
         fprintf(stderr, "Unable to stat %s: ", filename);
         perror(0);
-        fprintf(stderr, "Did you provide a valid file?");
+        fprintf(stderr, "Did you provide a valid file?\n");
         return 1;
     }
 
@@ -164,7 +161,7 @@ clp_run(struct clp_ctx *ctx)
 
     int status = 0;
     if (!package_exists(ctx->L, "clp")) {
-        fprintf(stderr, "ERROR: failed to load clp.lua\n");
+        fprintf(stderr, "ERROR: failed to load clp.lua on CLP_PATH %s\n",CLP_PATH);
         exit(1);
     }
 
