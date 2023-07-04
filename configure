@@ -302,7 +302,7 @@ EOF
 have_lua="no"
 have_lpeg="no"
 have_luautf8="no"
-for liblua in luajit lua lua5.4 lua5.3 lua5.2 lua-5.3 lua-5.2 lua54 lua53 lua52; do
+for liblua in luajit lua lua5.4 lua5.3 lua5.2 lua-5.4 lua-5.3 lua-5.2 lua54 lua53 lua52; do
 	printf " checking for %s... " "$liblua"
 
 	if test "$have_pkgconfig" = "yes"; then
