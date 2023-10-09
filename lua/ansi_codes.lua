@@ -24,6 +24,15 @@ local sgr_params = {
     cyan = 36,
     white = 37,
 
+    brblack = 90,
+    brred = 91,
+    brgreen = 92,
+    bryellow = 93,
+    brblue = 94,
+    brmagenta = 95,
+    brcyan = 96,
+    brwhite = 97,
+
     -- background
     onblack = 40,
     onred = 41,
@@ -32,7 +41,16 @@ local sgr_params = {
     onblue = 44,
     onmagenta = 45,
     oncyan = 46,
-    onwhite = 47
+    onwhite = 47,
+
+    onbrblack = 100,
+    onbrred = 101,
+    onbrgreen = 102,
+    onbryellow = 103,
+    onbrblue = 104,
+    onbrmagenta = 105,
+    onbrcyan = 106,
+    onbrwhite = 107
 }
 
 local function hex_to_rgb(hex)
