@@ -62,7 +62,12 @@ local function ansi_string_4b(color)
     local ansi_code = ""
     for attr, value in pairs(color) do
         if attr == "color" then
-            ansi_code = ansi_code .. ansi_string(sgr_params[value])
+            for param in string.gmatch(value, "[^%s]+") do
+                local code = sgr_params[param]
+                if code ~= nil then
+                    ansi_code = ansi_code .. ansi_string(code)
+                end
+            end
         else
             print('error in 4 bit color value')
         end
