@@ -62,12 +62,14 @@ function write(args)
 
     -- if a line was set to be highlighted, make sure it has valid bounds and
     -- then highlight it. Otherwise just write normally to stdout.
-    local hl_start_pos, hl_end_pos
+    local hl_start_pos, hl_end_pos, hl_next_pos
     if (highlight_line ~= nil and highlight_line > 0) then
-        hl_start_pos, hl_end_pos = find_hl_bounds(text, highlight_line)
+        hl_start_pos, hl_end_pos, hl_next_pos =
+            find_hl_bounds(text, highlight_line)
     end
     if (hl_start_pos ~= nil) then
-        write_hl(text, lexer, hl_start_pos, hl_end_pos, lang_theme)
+        write_hl(text, lexer, hl_start_pos, hl_end_pos, hl_next_pos,
+                 lang_theme)
     else
         write_nohl(text, lexer, lang_theme)
     end
@@ -80,36 +82,48 @@ function write_nohl(text, lexer, theme) write_styled(text, lexer, theme) end
 function reset_colors() io.write(tostring(ansi_codes.reset_sequence)) end
 
 function find_hl_bounds(s, n)
-    local i = 0
-    local hl_start_pos
-    if n == 1 then return 0, string.find(s, "\n", i + 1) end
-    while true do
-        i = string.find(s, "\n", i + 1)
-        if i == nil then return nil end
-        if n == 2 then
-            hl_start_pos = i
-            break
+    if n == nil or n < 1 then return nil end
+
+    local line_start = 1
+    local current = 1
+    while current < n do
+        local nl = string.find(s, "\n", line_start, true)
+        if nl == nil then return nil end
+        line_start = nl + 1
+        current = current + 1
+    end
+
+    local nl = string.find(s, "\n", line_start, true)
+    if nl == nil then
+        local line_end = #s
+        if line_end >= line_start and s:sub(line_end, line_end) == "\r" then
+            line_end = line_end - 1
         end
-        n = n - 1
+        return line_start, line_end, #s + 1
     end
-    i = string.find(s, "\n", i + 1)
-    if i == nil then
-        return i, nil
-    else
-        return hl_start_pos, i
+
+    local line_end = nl - 1
+    if line_end >= line_start and s:sub(line_end, line_end) == "\r" then
+        line_end = line_end - 1
     end
+    return line_start, line_end, nl + 1
 end
 
-function write_hl(text, lexer, hl_line_start, hl_line_end, lang_theme)
-    local pre_hl = text:sub(0, hl_line_start)
+function write_hl(text, lexer, hl_line_start, hl_line_end, hl_next_start,
+                  lang_theme)
+    local pre_hl = text:sub(1, hl_line_start - 1)
     local hl = text:sub(hl_line_start, hl_line_end)
-    hl = hl:gsub("\n", "")
-    local post_hl = text:sub(hl_line_end, nil)
+    local line_break = ""
+    if hl_line_end + 1 <= hl_next_start - 1 then
+        line_break = text:sub(hl_line_end + 1, hl_next_start - 1)
+    end
+    local post_hl = text:sub(hl_next_start)
     write_styled(pre_hl, lexer, lang_theme)
     if (hl ~= nil) then
         io.write(ansi_codes.begin_line_hl_ansi .. hl ..
                      ansi_codes.end_line_hl_ansi)
     end
+    if line_break ~= "" then io.write(line_break) end
     if (post_hl ~= nil) then write_styled(post_hl, lexer, lang_theme) end
 end
 
