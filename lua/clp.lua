@@ -6,6 +6,11 @@ local ansi_codes = require('ansi_codes')
 
 require('util')
 
+if not package.path:match('/lexers/%?%.lua') then
+    package.path = package.path .. ';' ..
+                       package.path:gsub('/%?%.lua', '/lexers/?.lua')
+end
+
 -- TODO: the logic in here changed in scintillua_6
 --            investigate if this is still (or was ever) needed
 function expand_theme(theme, lexer)

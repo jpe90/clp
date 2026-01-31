@@ -1,5 +1,6 @@
--- Copyright 2016-2023 Alejandro Baez (https://keybase.io/baez). See LICENSE.
+-- Copyright 2016-2025 Alejandro Baez (https://keybase.io/baez). See LICENSE.
 -- Dockerfile LPeg lexer.
+
 local lexer = lexer
 local P, S, B = lpeg.P, lpeg.S, lpeg.B
 
@@ -13,8 +14,8 @@ lex:add_rule('keyword', keyword)
 lex:add_rule('identifier', lex:tag(lexer.IDENTIFIER, lexer.word))
 
 -- Variable.
-lex:add_rule('variable', -B('\\') * lex:tag(lexer.OPERATOR, '$' * P('{') ^ -1) *
-                 lex:tag(lexer.VARIABLE, lexer.word))
+lex:add_rule('variable',
+-B('\\') * lex:tag(lexer.OPERATOR, '$' * P('{')^-1) * lex:tag(lexer.VARIABLE, lexer.word))
 
 -- Strings.
 local sq_str = lexer.range("'", false, false)
@@ -37,8 +38,8 @@ lex:embed(bash, start_rule, end_rule)
 
 -- Word lists.
 lex:set_word_list(lexer.KEYWORD, {
-    'ADD', 'ARG', 'CMD', 'COPY', 'ENTRYPOINT', 'ENV', 'EXPOSE', 'FROM', 'LABEL',
-    'MAINTAINER', 'ONBUILD', 'RUN', 'STOPSIGNAL', 'USER', 'VOLUME', 'WORKDIR'
+	'ADD', 'ARG', 'CMD', 'COPY', 'ENTRYPOINT', 'ENV', 'EXPOSE', 'FROM', 'LABEL', 'MAINTAINER',
+	'ONBUILD', 'RUN', 'STOPSIGNAL', 'USER', 'VOLUME', 'WORKDIR'
 })
 
 lexer.property['scintillua.comment'] = '#'

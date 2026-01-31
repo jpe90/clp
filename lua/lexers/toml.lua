@@ -1,5 +1,6 @@
--- Copyright 2015-2023 Alejandro Baez (https://keybase.io/baez). See LICENSE.
+-- Copyright 2015-2025 Alejandro Baez (https://keybase.io/baez). See LICENSE.
 -- TOML LPeg lexer.
+
 local lexer = lexer
 local P, S = lpeg.P, lpeg.S
 
@@ -24,17 +25,16 @@ lex:add_rule('operator', lex:tag(lexer.OPERATOR, S('=+-,.{}[]()')))
 
 -- Datetime.
 local year = lexer.digit * lexer.digit * lexer.digit * lexer.digit
-local month = lexer.digit * lexer.digit ^ -1
-local day = lexer.digit * lexer.digit ^ -1
+local month = lexer.digit * lexer.digit^-1
+local day = lexer.digit * lexer.digit^-1
 local date = year * '-' * month * '-' * day
-local hours = lexer.digit * lexer.digit ^ -1
+local hours = lexer.digit * lexer.digit^-1
 local minutes = lexer.digit * lexer.digit
 local seconds = lexer.digit * lexer.digit
-local fraction = '.' * lexer.digit ^ 0
-local time = hours * ':' * minutes * ':' * seconds * fraction ^ -1
-local zone = 'Z' + S(' \t') ^ 0 * S('-+') * hours * (':' * minutes) ^ -1
-lex:add_rule('datetime', lex:tag(lexer.NUMBER .. '.timestamp',
-                                 date * (S('tT \t') * time * zone ^ -1)))
+local fraction = '.' * lexer.digit^0
+local time = hours * ':' * minutes * ':' * seconds * fraction^-1
+local zone = 'Z' + S(' \t')^0 * S('-+') * hours * (':' * minutes)^-1
+lex:add_rule('datetime', lex:tag(lexer.NUMBER .. '.timestamp', date * (S('tT \t') * time * zone^-1)))
 
 -- Numbers.
 lex:add_rule('number', lex:tag(lexer.NUMBER, lexer.number))

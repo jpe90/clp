@@ -1,6 +1,7 @@
--- Copyright 2020-2023 Mitchell. See LICENSE.
+-- Copyright 2020-2025 Mitchell. See LICENSE.
 -- Elm LPeg lexer
 -- Adapted from Haskell LPeg lexer by Karl Schultheisz.
+
 local lexer = require('lexer')
 local token, word_match = lexer.token, lexer.word_match
 local P, S = lpeg.P, lpeg.S
@@ -8,17 +9,16 @@ local P, S = lpeg.P, lpeg.S
 local lex = lexer.new('elm', {fold_by_indentation = true})
 
 -- Whitespace.
-lex:add_rule('whitespace', token(lexer.WHITESPACE, lexer.space ^ 1))
+lex:add_rule('whitespace', token(lexer.WHITESPACE, lexer.space^1))
 
 -- Keywords.
 lex:add_rule('keyword', token(lexer.KEYWORD, word_match(
-                                  'if then else case of let in module import as exposing type alias port')))
+	'if then else case of let in module import as exposing type alias port')))
 
 -- Types & type constructors.
-local word = (lexer.alnum + S("._'#")) ^ 0
+local word = (lexer.alnum + S("._'#"))^0
 local op = lexer.punct - S('()[]{}')
-lex:add_rule('type',
-             token(lexer.TYPE, lexer.upper * word + ':' * (op ^ 1 - ':')))
+lex:add_rule('type', token(lexer.TYPE, lexer.upper * word + ':' * (op^1 - ':')))
 
 -- Identifiers.
 lex:add_rule('identifier', token(lexer.IDENTIFIER, (lexer.alpha + '_') * word))

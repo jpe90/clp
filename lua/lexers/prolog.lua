@@ -1,7 +1,8 @@
--- Copyright 2006-2023 Mitchell. See LICENSE.
+-- Copyright 2006-2025 Mitchell. See LICENSE.
 -- Lexer enhanced to conform to the realities of Prologs on the ground by
 -- Michael T. Richter.  Copyright is explicitly assigned back to Mitchell.
 -- Prolog LPeg lexer.
+
 --[[
   Prologs are notoriously fractious with many barely-compatible dialects.  To
   make Textadept more useful for these cases, directives and keywords are
@@ -20,7 +21,9 @@
   most information.  This is not an issue, however, because directives override
   arity-0 predicates which override arity-1+ predicates which override bifs
   which override operators.
-]] local lexer = require('lexer')
+]]
+
+local lexer = require('lexer')
 
 local token, word_match = lexer.token, lexer.word_match
 local P, S = lpeg.P, lpeg.S
@@ -67,13 +70,11 @@ directives.swipl = directives.iso .. [[
   module multifile op reexport thread_local use_module volatile
 ]]
 lex:add_rule('directive',
-             token(lexer.WHITESPACE, lexer.starts_line(S(' \t')) ^ 0) *
-                 token(lexer.OPERATOR, ':-') *
-                 token(lexer.WHITESPACE, S(' \t') ^ 0) *
-                 token(lexer.PREPROCESSOR, word_match(directives[dialect])))
+	token(lexer.WHITESPACE, lexer.starts_line(S(' \t'))^0) * token(lexer.OPERATOR, ':-') *
+		token(lexer.WHITESPACE, S(' \t')^0) * token(lexer.PREPROCESSOR, word_match(directives[dialect])))
 
 -- Whitespace.
-lex:add_rule('whitespace', token(lexer.WHITESPACE, lexer.space ^ 1))
+lex:add_rule('whitespace', token(lexer.WHITESPACE, lexer.space^1))
 
 -- Keywords.
 local zero_arity_keywords = {}
@@ -274,9 +275,8 @@ one_plus_arity_keywords.swipl = [[
   set_random prolog_stack_property put_char unload_file nb_setval put_byte
   current_signal put_code write_length string read_string text_to_string
 ]]
-lex:add_rule('keyword',
-             token(lexer.KEYWORD, word_match(zero_arity_keywords[dialect]) +
-                       word_match(one_plus_arity_keywords[dialect]) * #P('(')))
+lex:add_rule('keyword', token(lexer.KEYWORD, word_match(zero_arity_keywords[dialect]) +
+	word_match(one_plus_arity_keywords[dialect]) * #P('(')))
 
 -- BIFs.
 local bifs = {}
@@ -302,16 +302,14 @@ bifs.swipl = [[
 lex:add_rule('bif', token(lexer.FUNCTION, word_match(bifs[dialect]) * #P('(')))
 
 -- Numbers.
-local decimal_group = S('+-') ^ -1 * (lexer.digit + '_') ^ 1
-local binary_number = '0b' * (S('01') + '_') ^ 1
-local character_code = '0\'' * S('\\') ^ -1 * lexer.graph
-local decimal_number = decimal_group * ('.' * decimal_group) ^ -1 *
-                           ('e' * decimal_group) ^ -1
-local hexadecimal_number = '0x' * (lexer.xdigit + '_') ^ 1
-local octal_number = '0o' * (S('01234567') + '_') ^ 1
-lex:add_rule('number', token(lexer.NUMBER,
-                             character_code + binary_number + hexadecimal_number +
-                                 octal_number + decimal_number))
+local decimal_group = S('+-')^-1 * (lexer.digit + '_')^1
+local binary_number = '0b' * (S('01') + '_')^1
+local character_code = '0\'' * S('\\')^-1 * lexer.graph
+local decimal_number = decimal_group * ('.' * decimal_group)^-1 * ('e' * decimal_group)^-1
+local hexadecimal_number = '0x' * (lexer.xdigit + '_')^1
+local octal_number = '0o' * (S('01234567') + '_')^1
+lex:add_rule('number', token(lexer.NUMBER, character_code + binary_number + hexadecimal_number +
+	octal_number + decimal_number))
 
 -- Comments.
 local line_comment = lexer.to_eol('%')
@@ -332,13 +330,12 @@ operators.swipl = [[
   module_transparent multifile table dynamic thread_initialization thread_local
   initialization rem
 ]]
-lex:add_rule('operator', token(lexer.OPERATOR, word_match(operators[dialect]) +
-                                   S('-!+\\|=:;&<>()[]{}/*^@?.')))
+lex:add_rule('operator',
+	token(lexer.OPERATOR, word_match(operators[dialect]) + S('-!+\\|=:;&<>()[]{}/*^@?.')))
 
 -- Variables.
-lex:add_rule('variable', token(lexer.VARIABLE, (lexer.upper + '_') *
-                                   (lexer.word ^ 1 + lexer.digit ^ 1 + P('_') ^
-                                       1) ^ 0))
+lex:add_rule('variable', token(lexer.VARIABLE,
+	(lexer.upper + '_') * (lexer.word^1 + lexer.digit^1 + P('_')^1)^0))
 
 -- Identifiers.
 lex:add_rule('identifier', token(lexer.IDENTIFIER, lexer.word))

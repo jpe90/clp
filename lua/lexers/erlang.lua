@@ -1,5 +1,6 @@
--- Copyright 2006-2023 Mitchell. See LICENSE.
+-- Copyright 2006-2025 Mitchell. See LICENSE.
 -- Erlang LPeg lexer.
+
 local lexer = require('lexer')
 local token, word_match = lexer.token, lexer.word_match
 local P, S = lpeg.P, lpeg.S
@@ -7,60 +8,57 @@ local P, S = lpeg.P, lpeg.S
 local lex = lexer.new('erlang')
 
 -- Whitespace.
-lex:add_rule('whitespace', token(lexer.WHITESPACE, lexer.space ^ 1))
+lex:add_rule('whitespace', token(lexer.WHITESPACE, lexer.space^1))
 
 -- Keywords.
-lex:add_rule('keyword', token(lexer.KEYWORD, word_match {
-    'after', 'begin', 'case', 'catch', 'cond', 'end', 'fun', 'if', 'let', 'of',
-    'query', 'receive', 'try', 'when', -- Operators.
-    'div', 'rem', 'or', 'xor', 'bor', 'bxor', 'bsl', 'bsr', 'and', 'band',
-    'not', 'bnot', 'badarg', 'nocookie', 'orelse', 'andalso', 'false', 'true'
+lex:add_rule('keyword', token(lexer.KEYWORD, word_match{
+	'after', 'begin', 'case', 'catch', 'cond', 'end', 'fun', 'if', 'let', 'of', 'query', 'receive',
+	'try', 'when',
+	-- Operators.
+	'div', 'rem', 'or', 'xor', 'bor', 'bxor', 'bsl', 'bsr', 'and', 'band', 'not', 'bnot', 'badarg',
+	'nocookie', 'orelse', 'andalso', 'false', 'true'
 }))
 
 -- Functions.
-lex:add_rule('function', token(lexer.FUNCTION, word_match {
-    'abs', 'alive', 'apply', 'atom_to_list', 'binary_to_list', 'binary_to_term',
-    'concat_binary', 'date', 'disconnect_node', 'element', 'erase', 'exit',
-    'float', 'float_to_list', 'get', 'get_keys', 'group_leader', 'halt', 'hd',
-    'integer_to_list', 'is_alive', 'is_record', 'length', 'link',
-    'list_to_atom', 'list_to_binary', 'list_to_float', 'list_to_integer',
-    'list_to_pid', 'list_to_tuple', 'load_module', 'make_ref', 'monitor_node',
-    'node', 'nodes', 'now', 'open_port', 'pid_to_list', 'process_flag',
-    'process_info', 'process', 'put', 'register', 'registered', 'round', 'self',
-    'setelement', 'size', 'spawn', 'spawn_link', 'split_binary', 'statistics',
-    'term_to_binary', 'throw', 'time', 'tl', 'trunc', 'tuple_to_list', 'unlink',
-    'unregister', 'whereis', -- Others.
-    'any', 'atom', 'binary', 'bitstring', 'byte', 'constant', 'function',
-    'integer', 'list', 'map', 'mfa', 'non_neg_integer', 'number', 'pid',
-    'ports', 'port_close', 'port_info', 'pos_integer', 'reference', 'record',
-    -- Erlang.
-    'check_process_code', 'delete_module', 'get_cookie', 'hash', 'math',
-    'module_loaded', 'preloaded', 'processes', 'purge_module', 'set_cookie',
-    'set_node', -- Math.
-    'acos', 'asin', 'atan', 'atan2', 'cos', 'cosh', 'exp', 'log', 'log10',
-    'min', 'max', 'pi', 'pow', 'power', 'sin', 'sinh', 'sqrt', 'tan', 'tanh'
+lex:add_rule('function', token(lexer.FUNCTION, word_match{
+	'abs', 'alive', 'apply', 'atom_to_list', 'binary_to_list', 'binary_to_term', 'concat_binary',
+	'date', 'disconnect_node', 'element', 'erase', 'exit', 'float', 'float_to_list', 'get',
+	'get_keys', 'group_leader', 'halt', 'hd', 'integer_to_list', 'is_alive', 'is_record', 'length',
+	'link', 'list_to_atom', 'list_to_binary', 'list_to_float', 'list_to_integer', 'list_to_pid',
+	'list_to_tuple', 'load_module', 'make_ref', 'monitor_node', 'node', 'nodes', 'now', 'open_port',
+	'pid_to_list', 'process_flag', 'process_info', 'process', 'put', 'register', 'registered',
+	'round', 'self', 'setelement', 'size', 'spawn', 'spawn_link', 'split_binary', 'statistics',
+	'term_to_binary', 'throw', 'time', 'tl', 'trunc', 'tuple_to_list', 'unlink', 'unregister',
+	'whereis',
+	-- Others.
+	'any', 'atom', 'binary', 'bitstring', 'byte', 'constant', 'function', 'integer', 'list', 'map',
+	'mfa', 'non_neg_integer', 'number', 'pid', 'ports', 'port_close', 'port_info', 'pos_integer',
+	'reference', 'record',
+	-- Erlang.
+	'check_process_code', 'delete_module', 'get_cookie', 'hash', 'math', 'module_loaded', 'preloaded',
+	'processes', 'purge_module', 'set_cookie', 'set_node',
+	-- Math.
+	'acos', 'asin', 'atan', 'atan2', 'cos', 'cosh', 'exp', 'log', 'log10', 'min', 'max', 'pi', 'pow',
+	'power', 'sin', 'sinh', 'sqrt', 'tan', 'tanh'
 }))
 
 -- Identifiers.
-lex:add_rule('identifier',
-             token(lexer.IDENTIFIER, lexer.lower * ('_' + lexer.alnum) ^ 0))
+lex:add_rule('identifier', token(lexer.IDENTIFIER, lexer.lower * ('_' + lexer.alnum)^0))
 
 -- Variables.
-lex:add_rule('variable', token(lexer.VARIABLE, P('_') ^ 0 * lexer.upper *
-                                   ('_' + lexer.alnum) ^ 0))
+lex:add_rule('variable', token(lexer.VARIABLE, P('_')^0 * lexer.upper * ('_' + lexer.alnum)^0))
 
 -- Directives.
-lex:add_rule('directive', token(lexer.PREPROCESSOR, '-' * word_match {
-    'author', 'behaviour', 'behavior', 'compile', 'copyright', 'define', 'doc',
-    'else', 'endif', 'export', 'file', 'ifdef', 'ifndef', 'import', 'include',
-    'include_lib', 'module', 'record', 'spec', 'type', 'undef'
+lex:add_rule('directive', token(lexer.PREPROCESSOR, '-' * word_match{
+	'author', 'behaviour', 'behavior', 'compile', 'copyright', 'define', 'doc', 'else', 'endif',
+	'export', 'file', 'ifdef', 'ifndef', 'import', 'include', 'include_lib', 'module', 'record',
+	'spec', 'type', 'undef'
 }))
 
 -- Strings.
 local sq_str = lexer.range("'", true)
 local dq_str = lexer.range('"')
-lex:add_rule('string', token(lexer.STRING, sq_str + dq_str + '$' * lexer.any *
-                                 lexer.alnum ^ 0))
+lex:add_rule('string', token(lexer.STRING, sq_str + dq_str + '$' * lexer.any * lexer.alnum^0))
 
 -- Comments.
 lex:add_rule('comment', token(lexer.COMMENT, lexer.to_eol('%')))

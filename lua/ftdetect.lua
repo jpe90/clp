@@ -5,7 +5,7 @@ ftdetect.ignoresuffixes = {"~+$", "%.orig$", "%.bak$", "%.old$", "%.new$"}
 ftdetect.filetypes = {
     actionscript = {ext = {"%.as$", "%.asc$"}},
     ada = {ext = {"%.adb$", "%.ads$"}},
-    ansi_c = {ext = {"%.c$", "%.C$", "%.h$"}, mime = {"text/x-c"}},
+    c = {ext = {"%.c$", "%.C$"}, mime = {"text/x-c"}},
     antlr = {ext = {"%.g$", "%.g4$"}},
     apdl = {ext = {"%.ans$", "%.inp$", "%.mac$"}},
     apl = {ext = {"%.apl$"}},
@@ -37,8 +37,8 @@ ftdetect.filetypes = {
     coffeescript = {ext = {"%.coffee$"}, mime = {"text/x-coffee"}},
     cpp = {
         ext = {
-            "%.cpp$", "%.cxx$", "%.c++$", "%.cc$", "%.hh$", "%.hpp$", "%.hxx$",
-            "%.h++$"
+            "%.cpp$", "%.cxx$", "%.c++$", "%.cc$", "%.h$", "%.hh$", "%.hpp$",
+            "%.hxx$", "%.h++$"
         },
         mime = {"text/x-c++"}
     },
@@ -53,10 +53,10 @@ ftdetect.filetypes = {
         ext = {"%.diff$", "%.patch$", "%.rej$", "^COMMIT_EDITMSG$"},
         cmd = {"set colorcolumn 72"}
     },
-    dmd = {ext = {"%.d$", "%.di$"}},
+    d = {ext = {"%.d$", "%.di$"}},
     dockerfile = {ext = {"^Dockerfile$", "%.Dockerfile$"}},
     dot = {ext = {"%.dot$"}},
-    dsv = {ext = {"^group$", "^gshadow$", "^passwd$", "^shadow$"}},
+    factor = {ext = {"%.factor$"}},
     eiffel = {ext = {"%.e$", "%.eif$"}},
     elixir = {ext = {"%.ex$", "%.exs$"}},
     elm = {ext = {"%.elm$"}},
@@ -96,6 +96,7 @@ ftdetect.filetypes = {
     inform = {ext = {"%.inf$", "%.ni$"}},
     ini = {ext = {"%.cfg$", "%.cnf$", "%.conf$", "%.inf$", "%.ini$", "%.reg$"}},
     io_lang = {ext = {"%.io$"}},
+    janet = {ext = {"%.janet$"}},
     java = {ext = {"%.bsh$", "%.java$"}},
     javascript = {
         ext = {
@@ -134,22 +135,18 @@ ftdetect.filetypes = {
         },
         mime = {"text/x-makefile"}
     },
-    man = {
-        ext = {
-            "%.1$", "%.2$", "%.3$", "%.4$", "%.5$", "%.6$", "%.7$", "%.8$",
-            "%.9$", "%.1x$", "%.2x$", "%.3x$", "%.4x$", "%.5x$", "%.6x$",
-            "%.7x$", "%.8x$", "%.9x$"
-        }
-    },
     markdown = {ext = {"%.md$", "%.markdown$"}, mime = {"text/x-markdown"}},
     meson = {ext = {"^meson%.build$"}},
     moonscript = {ext = {"%.moon$"}, mime = {"text/x-moon"}},
     myrddin = {ext = {"%.myr$"}},
     nemerle = {ext = {"%.n$"}},
     networkd = {ext = {"%.link$", "%.network$", "%.netdev$"}},
+    nix = {ext = {"%.nix$"}},
     nim = {ext = {"%.nim$"}},
     nsis = {ext = {"%.nsh$", "%.nsi$", "%.nsis$"}},
     objective_c = {ext = {"%.m$", "%.mm$", "%.objc$"}, mime = {"text/x-objc"}},
+    objeck = {ext = {"%.obs$"}},
+    org = {ext = {"%.org$"}},
     pascal = {ext = {"%.dpk$", "%.dpr$", "%.p$", "%.pas$"}},
     perl = {
         ext = {"%.al$", "%.perl$", "%.pl$", "%.pm$", "%.pod$"},
@@ -181,7 +178,7 @@ ftdetect.filetypes = {
         ext = {"%.rsc"},
         detect = function(_, data) return data:match("^#.* by RouterOS") end
     },
-    rstats = {
+    r = {
         ext = {
             "%.R$", "%.Rout$", "%.Rhistory$", "%.Rt$", "Rout.save", "Rout.fail"
         }
@@ -215,7 +212,17 @@ ftdetect.filetypes = {
         -- Do *not* list mime "text/plain" here, it is covered below,
         -- see 'try text lexer as a last resort'
     },
+    todotxt = {
+        ext = {"todo%.txt$", "Todo%.txt$", "done%.txt$", "Done%.txt$"}
+    },
     toml = {ext = {"%.toml$"}},
+    troff = {
+        ext = {
+            "%.1$", "%.2$", "%.3$", "%.4$", "%.5$", "%.6$", "%.7$", "%.8$",
+            "%.9$", "%.1x$", "%.2x$", "%.3x$", "%.4x$", "%.5x$", "%.6x$",
+            "%.7x$", "%.8x$", "%.9x$"
+        }
+    },
     typescript = {ext = {"%.ts$"}},
     vala = {ext = {"%.vala$"}},
     vb = {

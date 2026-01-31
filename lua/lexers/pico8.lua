@@ -1,6 +1,7 @@
--- Copyright 2016-2023 Alejandro Baez (https://keybase.io/baez). See LICENSE.
+-- Copyright 2016-2025 Alejandro Baez (https://keybase.io/baez). See LICENSE.
 -- PICO-8 lexer.
 -- http://www.lexaloffle.com/pico-8.php
+
 local lexer = lexer
 local word_match = lexer.word_match
 local P, S = lpeg.P, lpeg.S
@@ -8,8 +9,8 @@ local P, S = lpeg.P, lpeg.S
 local lex = lexer.new(...)
 
 -- Keywords
-lex:add_rule('keyword', lex:tag(lexer.KEYWORD, lexer.word_match(
-                                    '__gff__ __map__ __sfx__ __music__')))
+lex:add_rule('keyword',
+	lex:tag(lexer.KEYWORD, lexer.word_match('__gff__ __map__ __sfx__ __music__')))
 
 -- Identifiers
 lex:add_rule('identifier', lex:tag(lexer.IDENTIFIER, lexer.word))

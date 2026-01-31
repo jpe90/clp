@@ -1,21 +1,19 @@
--- Copyright 2006-2023 Mitchell. See LICENSE.
+-- Copyright 2006-2025 Mitchell. See LICENSE.
 -- Desktop Entry LPeg lexer.
+
 local lexer = lexer
 local P, S = lpeg.P, lpeg.S
 
 local lex = lexer.new(...)
 
 -- Keys.
-lex:add_rule('key', lex:tag(lexer.VARIABLE_BUILTIN,
-                            lex:word_match(lexer.VARIABLE_BUILTIN)))
+lex:add_rule('key', lex:tag(lexer.VARIABLE_BUILTIN, lex:word_match(lexer.VARIABLE_BUILTIN)))
 
 -- Values.
-lex:add_rule('value',
-             lex:tag(lexer.CONSTANT_BUILTIN, lexer.word_match('true false')))
+lex:add_rule('value', lex:tag(lexer.CONSTANT_BUILTIN, lexer.word_match('true false')))
 
 -- Identifiers.
-lex:add_rule('identifier', lex:tag(lexer.IDENTIFIER,
-                                   lexer.alpha * (lexer.alnum + S('_-')) ^ 0))
+lex:add_rule('identifier', lex:tag(lexer.IDENTIFIER, lexer.alpha * (lexer.alnum + S('_-'))^0))
 
 -- Group headers.
 local bracketed = lexer.range('[', ']')
@@ -41,10 +39,9 @@ lex:add_rule('operator', lex:tag(lexer.OPERATOR, S('=')))
 
 -- Word lists.
 lex:set_word_list(lexer.VARIABLE_BUILTIN, {
-    'Type', 'Version', 'Name', 'GenericName', 'NoDisplay', 'Comment', 'Icon',
-    'Hidden', 'OnlyShowIn', 'NotShowIn', 'TryExec', 'Exec', 'Exec', 'Path',
-    'Terminal', 'MimeType', 'Categories', 'StartupNotify', 'StartupWMClass',
-    'URL'
+	'Type', 'Version', 'Name', 'GenericName', 'NoDisplay', 'Comment', 'Icon', 'Hidden', 'OnlyShowIn',
+	'NotShowIn', 'TryExec', 'Exec', 'Exec', 'Path', 'Terminal', 'MimeType', 'Categories',
+	'StartupNotify', 'StartupWMClass', 'URL'
 })
 
 lexer.property['scintillua.comment'] = '#'
