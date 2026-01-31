@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  echo "usage: $(basename "$0") [--] <pattern> [path]" >&2
+}
+
+if [ $# -lt 1 ]; then
+  usage
+  exit 2
+fi
+
+case "${1:-}" in
+  -h|--help)
+    usage
+    exit 0
+    ;;
+  --)
+    shift
+    ;;
+esac
+
+if [ $# -lt 1 ]; then
+  usage
+  exit 2
+fi
+
+pattern=$1
+root=${2:-}
+
+if [ -z "${root}" ]; then
+  if command -v git >/dev/null 2>&1 && git rev-parse --show-toplevel >/dev/null 2>&1; then
+    root=$(git rev-parse --show-toplevel)
+  else
+    root=.
+  fi
+fi
+
+for cmd in rg fzf clp nvim; do
+  command -v "$cmd" >/dev/null 2>&1 || {
+    echo "missing dependency: $cmd" >&2
+    exit 1
+  }
+done
+
+rg --color=always --line-number --column --no-heading \
+  --colors 'path:none' --colors 'line:none' --colors 'column:none' \
+  "$pattern" "$root" |
+fzf --ansi --delimiter=':' -n 4.. \
+  --preview-window '+{2}-/2' \
+  --preview 'clp --highlight-line {2} {1}' \
+  --bind 'ctrl-o:execute(nvim +{2} {1} < /dev/tty)'

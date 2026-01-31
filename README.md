@@ -54,6 +54,10 @@ $ make
 $ clp [options] filename
 ```
 
+### Convenience script (example)
+
+An example helper script is included at `scripts/sp`. It uses `rg` + `fzf` and previews with `clp`. This is only an example, and it opens files with Neovim (`nvim`) on `ctrl-o`. Adjust it to your editor and workflow as needed.
+
 #### -t, --override-filetype {filetype}
 
 Force a language's syntax for highlighting the file. To see available filetypes, run clp --list-overrides
