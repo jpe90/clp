@@ -112,7 +112,7 @@ clp_init(struct clp_ctx *ctx)
     }
 
     if (home && *home) {
-        if (strlen(home) > PATH_MAX) {
+        if (strlen(home) > PATHMAX) {
             printf(
                 "Error: The length of the return value of getenv() is greater "
                 "than PATH_MAX\n");

@@ -19,10 +19,10 @@ config.mk:
 	@touch $@
 
 clp: config.mk clp.o cli.c
-	$(CC) cli.c $(CFLAGS) $(LDFLAGS) clp.o -o clp
+	$(CC) cli.c clp.o $(CFLAGS) -o clp $(LDFLAGS)
 
 $(TEST_ELF): clp.o $(TEST_SRC)
-	$(CC) $(TEST_SRC) $(CFLAGS) $(LDFLAGS) $(CFLAGS_PCRE2) $(LDFLAGS_PCRE2) clp.o -o $(TEST_ELF)
+	$(CC) $(TEST_SRC) clp.o $(CFLAGS) $(CFLAGS_PCRE2) -o $(TEST_ELF) $(LDFLAGS) $(LDFLAGS_PCRE2)
 
 .PHONY: tests
 
