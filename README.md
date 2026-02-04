@@ -41,6 +41,7 @@ $ make
 ##### Ubuntu
 ```
 # apt-get install -y build-essential pkg-config libluajit-5.1-dev lua-lpeg
+# luarocks --lua-version=5.1 install luautf8
 ```
 
 ##### Arch
